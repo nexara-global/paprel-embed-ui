@@ -1,0 +1,53 @@
+{
+  "name": "@paprel/accounting",
+  "version": "0.1.0",
+  "description": "Paprel operational accounting resources and embeddable Web Components",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./configure": {
+      "types": "./dist/configure.d.ts",
+      "import": "./dist/configure.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./openapi/openapi-embed-v1.json": "./openapi/openapi-embed-v1.json"
+  },
+  "files": ["dist", "openapi", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.json --emitDeclarationOnly && cp ../ui/dist/styles.css dist/styles.css",
+    "test": "node --import tsx --test src/*.test.ts src/**/*.test.ts",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexara-global/paprel-embed-ui.git",
+    "directory": "packages/accounting"
+  },
+  "bugs": "https://github.com/nexara-global/paprel-embed-ui/issues",
+  "homepage": "https://paprel.com/documentation/embedded-ui/overview",
+  "keywords": ["paprel", "accounting", "embed", "web-components", "lit"],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "peerDependencies": {
+    "@paprel/embed-core": "^0.1.0"
+  },
+  "dependencies": {
+    "@paprel/ui": "^0.1.0",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@paprel/embed-core": "*",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@paprel/ui",
+  "version": "0.1.0",
+  "description": "Shared theme tokens and UI primitives for Paprel domain packages",
+  "type": "module",
+  "exports": {
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "node ../../scripts/clean-dist.mjs && mkdir -p dist && cp src/styles.css dist/styles.css",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexara-global/paprel-embed-ui.git",
+    "directory": "packages/ui"
+  },
+  "bugs": "https://github.com/nexara-global/paprel-embed-ui/issues",
+  "homepage": "https://paprel.com/documentation/embedded-ui/overview",
+  "keywords": ["paprel", "theme", "design-tokens", "web-components"],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

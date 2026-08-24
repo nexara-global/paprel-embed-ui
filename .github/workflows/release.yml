@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  release:
+    name: Version and publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require main branch
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "::error::Run this workflow from the main branch only (current: ${{ github.ref }})."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Verify npm CLI supports trusted publishing
+        run: |
+          echo "Node $(node --version), npm $(npm --version)"
+          node -e "
+            const { execSync } = require('node:child_process');
+            const v = execSync('npm --version', { encoding: 'utf8' }).trim();
+            const [maj, min, pat] = v.split('.').map(Number);
+            const ok = maj > 11 || (maj === 11 && min > 5) || (maj === 11 && min === 5 && pat >= 1);
+            if (!ok) {
+              console.error('npm 11.5.1+ required for trusted publishing (OIDC)');
+              process.exit(1);
+            }
+          "
+
+      - run: npm ci
+
+      - name: Build, test, and publish
+        run: npm run release
+
+      - name: Summary
+        run: |
+          echo "Publish complete via npm trusted publishing (OIDC)."
+          echo "Package versions must be reviewed and committed to main before this workflow runs."

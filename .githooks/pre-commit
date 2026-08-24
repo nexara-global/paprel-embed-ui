@@ -1,0 +1,10 @@
+#!/bin/bash
+# Blocks commits on protected branches (main, master, develop, production).
+export PATH="/usr/bin:/bin:/opt/homebrew/bin:${PATH:-}"
+
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=lib/protected-branch.sh
+source "$HOOK_DIR/lib/protected-branch.sh"
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+check_protected_branch_commit "$REPO_ROOT"

@@ -1,0 +1,44 @@
+{
+  "name": "@paprel/reports",
+  "version": "0.1.0",
+  "description": "Complete Paprel financial reports client and embeddable Web Components",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.json --emitDeclarationOnly",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexara-global/paprel-embed-ui.git",
+    "directory": "packages/reports"
+  },
+  "bugs": "https://github.com/nexara-global/paprel-embed-ui/issues",
+  "homepage": "https://paprel.com/documentation/embedded-ui/overview",
+  "keywords": ["paprel", "accounting", "financial-reports", "embed", "web-components"],
+  "license": "MIT",
+  "publishConfig": { "access": "public", "provenance": true },
+  "peerDependencies": {
+    "@paprel/accounting": "^0.1.0",
+    "@paprel/embed-core": "^0.1.0"
+  },
+  "dependencies": {
+    "@paprel/ui": "^0.1.0",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@paprel/accounting": "*",
+    "@paprel/embed-core": "*",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  }
+}

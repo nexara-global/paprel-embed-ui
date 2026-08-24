@@ -1,0 +1,38 @@
+{
+  "name": "@paprel/embed-core",
+  "version": "0.1.0",
+  "description": "Shared Paprel embed authentication, HTTP transport, errors, and primitives",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json",
+    "test": "node --import tsx --test src/*.test.ts src/**/*.test.ts",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexara-global/paprel-embed-ui.git",
+    "directory": "packages/core"
+  },
+  "bugs": "https://github.com/nexara-global/paprel-embed-ui/issues",
+  "homepage": "https://paprel.com/documentation/embedded-ui/overview",
+  "keywords": ["paprel", "embed", "app-connect", "sdk"],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
