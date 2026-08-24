@@ -86,13 +86,18 @@ Packages are `@paprel/embed-core`, `@paprel/ui`, `@paprel/accounting`, and `@pap
 ### One-time npm setup
 
 1. Create the **`paprel`** org on [npmjs.com](https://www.npmjs.com/org/create) (claims the `@paprel` scope).
-2. **First publish** each package once from a maintainer machine (npm requires the package to exist before trusted publishing can be configured):
+2. **First publish** each package once from a maintainer machine (npm requires the package to exist before trusted publishing can be configured). The manifests enable provenance for CI, so explicitly disable it for this one local publication:
    ```bash
-   npm run build && npm run pack:check
-   npm publish -w @paprel/embed-core
-   npm publish -w @paprel/ui
-   npm publish -w @paprel/accounting
-   npm publish -w @paprel/reports
+   npm run lint && npm test && npm run pack:check && npm run consumer:check
+   npm publish --provenance=false -w @paprel/embed-core
+   npm publish --provenance=false -w @paprel/ui
+   npm publish --provenance=false -w @paprel/accounting
+   npm publish --provenance=false -w @paprel/reports
+   git tag @paprel/embed-core@0.1.0
+   git tag @paprel/ui@0.1.0
+   git tag @paprel/accounting@0.1.0
+   git tag @paprel/reports@0.1.0
+   git push origin --tags
    ```
 3. On npm, configure trusted publishing for all four packages, including `@paprel/reports`.
    - Organization / user: `nexara-global`
@@ -101,6 +106,8 @@ Packages are `@paprel/embed-core`, `@paprel/ui`, `@paprel/accounting`, and `@pap
 4. (Recommended) **Settings → Publishing access → Require 2FA and disallow tokens** — OIDC publishes still work; long-lived write tokens are blocked.
 
 Do **not** add an `NPM_TOKEN` secret for publishing. The workflow uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC). Requires npm CLI 11.5.1+ (bundled with Node 24 on GitHub runners).
+
+The local first publish is the only exception: it uses your interactive npm maintainer session and `--provenance=false`. All subsequent releases should use the GitHub workflow so npm can attach provenance.
 
 `package.json` `repository.url` must match `https://github.com/nexara-global/paprel-embed-ui` for OIDC validation.
 
