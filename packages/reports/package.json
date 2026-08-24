@@ -38,7 +38,7 @@
   "devDependencies": {
     "@paprel/accounting": "*",
     "@paprel/embed-core": "*",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.3"
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
   }
 }
