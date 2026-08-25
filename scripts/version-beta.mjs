@@ -22,17 +22,20 @@ if (process.argv.includes("--dry-run")) {
   process.exit(0);
 }
 
-await Promise.all(sources.map((source, index) =>
-  writeFile(manifests[index], source.replace(versionPattern, (_full, prefix, _base, _number, suffix) => `${prefix}${nextVersion}${suffix}`)),
-));
-
 const lockFile = "package-lock.json";
-const lock = JSON.parse(await readFile(lockFile, "utf8"));
+let lockSource = await readFile(lockFile, "utf8");
 for (const name of packages) {
-  const entry = lock.packages?.[`packages/${name}`];
-  if (!entry) throw new Error(`${lockFile} is missing packages/${name}`);
-  entry.version = nextVersion;
+  const entryPattern = new RegExp(`("packages/${name}"\\s*:\\s*\\{[\\s\\S]*?"version"\\s*:\\s*")${versions[0].replaceAll(".", "\\.")}(")`);
+  const match = lockSource.match(entryPattern);
+  if (!match) throw new Error(`${lockFile} is missing packages/${name}@${versions[0]}`);
+  lockSource = lockSource.replace(entryPattern, (_full, prefix, suffix) => `${prefix}${nextVersion}${suffix}`);
 }
-await writeFile(lockFile, `${JSON.stringify(lock, null, 2)}\n`);
+
+await Promise.all([
+  ...sources.map((source, index) =>
+    writeFile(manifests[index], source.replace(versionPattern, (_full, prefix, _base, _number, suffix) => `${prefix}${nextVersion}${suffix}`)),
+  ),
+  writeFile(lockFile, lockSource),
+]);
 
 console.log(`Versioned all Paprel embed packages: ${versions[0]} -> ${nextVersion}`);
