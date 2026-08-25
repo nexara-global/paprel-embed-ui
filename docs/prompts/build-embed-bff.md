@@ -9,7 +9,7 @@ Use this when a developer provides Paprel OpenAPI (embed slice), embedded UI doc
 Implement a **production-ready partner integration** for Paprel embedded accounting:
 
 1. **Backend:** App Connect token exchange route (BFF) — see contract below
-2. **Frontend:** Configure `@paprel/accounting` and mount requested widgets
+2. **Frontend:** Configure `@paprel/embed-accounting` and mount requested widgets
 3. **Config:** Document required environment variables
 
 Do not implement accounting business logic in the BFF. The BFF only exchanges `client_credentials` for an access token.
@@ -20,7 +20,7 @@ Do not implement accounting business logic in the BFF. The BFF only exchanges `c
 
 - **BFF contract:** `paprel-embed/docs/partner-integration/bff-contract.md`
 - **Full guide:** `handbook/product/embed-partner-bff-guide.md`
-- **OpenAPI embed v1:** `@paprel/accounting/openapi/openapi-embed-v1.json` (App Connect + `/v1/accounting/*`, `/v1/reports/*`) — or [paprel.com API documentation](https://paprel.com/api-documentation)
+- **OpenAPI embed v1:** `@paprel/embed-accounting/openapi/openapi-embed-v1.json` (App Connect + `/v1/accounting/*`, `/v1/reports/*`) — or [paprel.com API documentation](https://paprel.com/api-documentation)
 - **Reference BFF:** `paprel-embed-ui-examples/shared/dev-token-bff.ts`
 - **Reference frontend:** `paprel-embed-ui-examples/apps/component-lab/main.ts` (`configureAccounting` block)
 
@@ -78,7 +78,7 @@ Return `{ "error": "..." }` with appropriate HTTP status. Never leak `client_sec
 ## Frontend requirements
 
 ```typescript
-import { configureAccounting } from "@paprel/accounting";
+import { configureAccounting } from "@paprel/embed-accounting";
 
 configureAccounting({
   baseUrl: process.env.NEXT_PUBLIC_PAPREL_API_BASE_URL ?? "", // "" if same-origin /v1 proxy

@@ -7,7 +7,7 @@ Copy these into **Cursor**, **Claude**, or **Codex** when building a partner int
 | Prompt | Use when |
 |--------|----------|
 | [`build-embed-bff.md`](build-embed-bff.md) | **Primary** — "Implement BFF + wire widgets" (OpenAPI + embed docs + stack) |
-| [`wire-embed-widgets.md`](wire-embed-widgets.md) | BFF exists; add `@paprel/accounting` to a page |
+| [`wire-embed-widgets.md`](wire-embed-widgets.md) | BFF exists; add `@paprel/embed-accounting` to a page |
 | [`bff-express.md`](bff-express.md) | Express / Fastify token route only |
 | [`bff-nextjs.md`](bff-nextjs.md) | Next.js App Router token route only |
 
@@ -15,7 +15,7 @@ Copy these into **Cursor**, **Claude**, or **Codex** when building a partner int
 
 When asking an agent to build integration from scratch, provide:
 
-1. **OpenAPI embed slice** — `@paprel/accounting/openapi/openapi-embed-v1.json` (after `npm install @paprel/embed-core`), or [paprel.com API documentation](https://paprel.com/api-documentation)
+1. **OpenAPI embed slice** — `@paprel/embed-accounting/openapi/openapi-embed-v1.json` (after `npm install @paprel/embed-core`), or [paprel.com API documentation](https://paprel.com/api-documentation)
 2. **BFF contract** — [`../partner-integration/bff-contract.md`](../partner-integration/bff-contract.md)
 3. **Partner BFF guide** — [Paprel: Build your BFF](https://paprel.com/documentation/embedded-ui/build-bff)
 4. **This prompt** — [`build-embed-bff.md`](build-embed-bff.md)

@@ -3,7 +3,7 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["@paprel/embed-core", "@paprel/ui", "@paprel/accounting", "@paprel/reports"]],
+  "linked": [["@paprel/embed-core", "@paprel/embed-ui", "@paprel/embed-accounting", "@paprel/embed-reports"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",

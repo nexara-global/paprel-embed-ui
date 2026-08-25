@@ -5,7 +5,7 @@ import { PaprelApiError } from "../headless.js";
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import { hasUnmappedValidation, validationMessages, withoutValidationField } from "../lib/form-validation.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 
 @customElement("paprel-account-form")
 export class PaprelAccountForm extends LitElement {

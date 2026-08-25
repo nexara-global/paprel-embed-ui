@@ -5,12 +5,12 @@ import {
   formatJournalAmount,
   parseDateRangeParam,
   type ReportDisplayRow,
-} from "@paprel/accounting";
-import { getEmbedClient, getEmbedI18n } from "@paprel/accounting";
+} from "@paprel/embed-accounting";
+import { getEmbedClient, getEmbedI18n } from "@paprel/embed-accounting";
 import { isoDateField } from "../lib/iso-date-field.js";
 import { flattenSections, renderStatementTable } from "../lib/statement-report.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 
 @customElement("paprel-income-statement")
 export class PaprelIncomeStatement extends LitElement {

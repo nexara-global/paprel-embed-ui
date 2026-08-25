@@ -1,5 +1,5 @@
 {
-  "name": "@paprel/ui",
+  "name": "@paprel/embed-ui",
   "version": "0.1.0",
   "description": "Shared theme tokens and UI primitives for Paprel domain packages",
   "type": "module",

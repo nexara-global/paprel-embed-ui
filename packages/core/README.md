@@ -32,7 +32,7 @@ container.addEventListener("paprel:view-change", (event) => {
 npm install @paprel/embed-core
 ```
 
-Use with complete domain packages such as `@paprel/accounting`. Business resources and UI live in their owning domain package, not in core.
+Use with complete domain packages such as `@paprel/embed-accounting`. Business resources and UI live in their owning domain package, not in core.
 
 ## Documentation
 

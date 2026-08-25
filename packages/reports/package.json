@@ -1,5 +1,5 @@
 {
-  "name": "@paprel/reports",
+  "name": "@paprel/embed-reports",
   "version": "0.1.0",
   "description": "Complete Paprel financial reports client and embeddable Web Components",
   "type": "module",
@@ -28,15 +28,15 @@
   "license": "MIT",
   "publishConfig": { "access": "public", "provenance": true },
   "peerDependencies": {
-    "@paprel/accounting": "^0.1.0",
+    "@paprel/embed-accounting": "^0.1.0",
     "@paprel/embed-core": "^0.1.0"
   },
   "dependencies": {
-    "@paprel/ui": "^0.1.0",
+    "@paprel/embed-ui": "^0.1.0",
     "lit": "^3.2.1"
   },
   "devDependencies": {
-    "@paprel/accounting": "*",
+    "@paprel/embed-accounting": "*",
     "@paprel/embed-core": "*",
     "typescript": "^7.0.2",
     "vite": "^8.2.2"

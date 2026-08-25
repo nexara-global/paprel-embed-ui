@@ -1,5 +1,5 @@
 import { html, type TemplateResult } from "lit";
-import { normalizeIsoDate } from "@paprel/accounting";
+import { normalizeIsoDate } from "@paprel/embed-accounting";
 
 type IsoDateFieldOptions = { required?: boolean; id?: string };
 

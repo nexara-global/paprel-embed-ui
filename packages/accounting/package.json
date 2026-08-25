@@ -1,5 +1,5 @@
 {
-  "name": "@paprel/accounting",
+  "name": "@paprel/embed-accounting",
   "version": "0.1.0",
   "description": "Paprel operational accounting resources and embeddable Web Components",
   "type": "module",
@@ -41,7 +41,7 @@
     "@paprel/embed-core": "^0.1.0"
   },
   "dependencies": {
-    "@paprel/ui": "^0.1.0",
+    "@paprel/embed-ui": "^0.1.0",
     "lit": "^3.2.1"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-# Prompt: Wire @paprel/accounting widgets
+# Prompt: Wire @paprel/embed-accounting widgets
 
 Use when the **BFF already exists** (`/api/embed-token` returns `accessToken` + `expiresAt`).
 
@@ -24,8 +24,8 @@ Add Paprel embedded accounting widgets to my app.
 
 ## Requirements
 
-1. Install: `npm install @paprel/embed-core @paprel/accounting`
-2. Import `configureAccounting` from `@paprel/accounting`; the same import registers components and includes their styles
+1. Install: `npm install @paprel/embed-core @paprel/embed-accounting`
+2. Import `configureAccounting` from `@paprel/embed-accounting`; the same import registers components and includes their styles
 3. Call `configureAccounting` before mounting custom elements
 4. `auth.getTokens()` → `fetch("/api/embed-token")` mapping per bff-contract.md
 5. Set `auth.partnerDomain` to match App Connect client

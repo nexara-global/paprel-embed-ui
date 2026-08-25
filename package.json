@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @paprel/embed-core && npm run build -w @paprel/ui && npm run build -w @paprel/accounting && npm run build -w @paprel/reports",
+    "build": "npm run build -w @paprel/embed-core && npm run build -w @paprel/embed-ui && npm run build -w @paprel/embed-accounting && npm run build -w @paprel/embed-reports",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run build && npm run lint --workspaces --if-present",
     "pack:check": "node scripts/pack-check.mjs",
