@@ -47,7 +47,6 @@
 .paprel-panel,
 .ledger-editor,
 .ledger-detail,
-.ledger-report,
 .bank-hub {
   border: 1px solid var(--_paprel-border);
   border-radius: var(--paprel-radius, 14px);
@@ -58,9 +57,12 @@
 .paprel-panel,
 .ledger-editor,
 .ledger-detail,
-.ledger-report,
 .bank-hub {
   padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.ledger-report {
+  min-width: 0;
 }
 
 .paprel-panel-header {
