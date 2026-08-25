@@ -6,6 +6,7 @@ import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import { hasUnmappedValidation, validationMessages, withoutValidationField } from "../lib/form-validation.js";
 import sharedStyles from "@paprel/embed-ui/styles.css?inline";
+import { dispatchPaprelOperationSuccess } from "@paprel/embed-core";
 
 @customElement("paprel-account-form")
 export class PaprelAccountForm extends LitElement {
@@ -16,6 +17,7 @@ export class PaprelAccountForm extends LitElement {
   @state() private loading = false;
   @state() private saving = false;
   @state() private error = "";
+  @state() private success = "";
   @state() private fieldErrors: Record<string, string[]> = {};
   @state() private isSystemDefined = false;
   @state() private subtypes: AccountSubtype[] = [];
@@ -97,6 +99,7 @@ export class PaprelAccountForm extends LitElement {
 
   private updateForm<K extends keyof AccountForm>(field: K, value: AccountForm[K]): void {
     this.form = { ...this.form, [field]: value };
+    this.success = "";
     this.clearFieldError(String(field));
   }
 
@@ -105,6 +108,7 @@ export class PaprelAccountForm extends LitElement {
 
     this.saving = true;
     this.error = "";
+    this.success = "";
     this.fieldErrors = {};
 
     try {
@@ -113,6 +117,13 @@ export class PaprelAccountForm extends LitElement {
         ? await client.accounts.update(this.accountId, this.form)
         : await client.accounts.create(this.form);
       client.refresh();
+      this.success = this.accountId ? "Account updated successfully." : "Account created successfully.";
+      dispatchPaprelOperationSuccess(this, {
+        source: { component: "paprel-account-form" },
+        action: this.accountId ? "account.updated" : "account.created",
+        message: this.success,
+        resource: { type: "account", id: result.id ? String(result.id) : undefined },
+      });
       this.dispatchEvent(
         new CustomEvent("account-saved", { detail: { account: result }, bubbles: true, composed: true }),
       );
@@ -150,6 +161,7 @@ export class PaprelAccountForm extends LitElement {
           ? html`<div class="ledger-error">${i18n.t("systemAccountReadOnly")}</div>`
           : null}
         ${this.error ? html`<div class="ledger-error">${this.error}</div>` : null}
+        ${this.success ? html`<div class="ledger-success" role="status">${this.success}</div>` : null}
 
         <section class="ledger-form-section">
         <h4 class="ledger-form-section-title">Account details</h4>

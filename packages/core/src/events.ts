@@ -3,6 +3,7 @@ export const PAPREL_EVENT_VERSION = 1 as const;
 export const PAPREL_EVENTS = {
   viewChange: "paprel:view-change",
   resourceOpen: "paprel:resource-open",
+  operationSuccess: "paprel:operation-success",
 } as const;
 
 export type PaprelViewChangeReason =
@@ -42,6 +43,14 @@ export interface PaprelResourceOpenDetail {
   id: string;
 }
 
+export interface PaprelOperationSuccessDetail {
+  version: typeof PAPREL_EVENT_VERSION;
+  source: PaprelEventSource;
+  action: string;
+  message: string;
+  resource?: { type: string; id?: string };
+}
+
 export function dispatchPaprelViewChange(
   target: EventTarget,
   detail: Omit<PaprelViewChangeDetail, "version">,
@@ -69,9 +78,23 @@ export function dispatchPaprelResourceOpen(
   );
 }
 
+export function dispatchPaprelOperationSuccess(
+  target: EventTarget,
+  detail: Omit<PaprelOperationSuccessDetail, "version">,
+): boolean {
+  return target.dispatchEvent(
+    new CustomEvent<PaprelOperationSuccessDetail>(PAPREL_EVENTS.operationSuccess, {
+      bubbles: true,
+      composed: true,
+      detail: { version: PAPREL_EVENT_VERSION, ...detail },
+    }),
+  );
+}
+
 declare global {
   interface HTMLElementEventMap {
     "paprel:resource-open": CustomEvent<PaprelResourceOpenDetail>;
     "paprel:view-change": CustomEvent<PaprelViewChangeDetail>;
+    "paprel:operation-success": CustomEvent<PaprelOperationSuccessDetail>;
   }
 }
