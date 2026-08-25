@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Paprel Embed API v1",
-    "description": "Versioned subset of the Paprel public API used by @paprel/accounting.",
+    "description": "Versioned subset of the Paprel public API used by @paprel/embed-accounting.",
     "termsOfService": "https://newledger.io/terms",
     "contact": {
       "name": "NewLedger Support",

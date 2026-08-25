@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import { formatJournalAmount, type JournalSummary } from "../headless.js";
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 import { dispatchPaprelResourceOpen, dispatchPaprelViewChange, type PaprelViewChangeReason } from "@paprel/embed-core";
 
 type JournalStatus = "posted" | "draft" | "voided" | "reversal";

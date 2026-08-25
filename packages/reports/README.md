@@ -1,10 +1,10 @@
-# @paprel/reports
+# @paprel/embed-reports
 
 The complete Paprel financial reports module: Trial Balance, Balance Sheet, Income Statement, Cash Flow, and General Ledger.
 
 ```ts
-import { configureAccounting } from "@paprel/accounting";
-import "@paprel/reports";
+import { configureAccounting } from "@paprel/embed-accounting";
+import "@paprel/embed-reports";
 ```
 
 Configure accounting once, then mount any report:

@@ -4,14 +4,14 @@ npm packages for embedding Paprel in partner apps.
 
 **First release scope:** full embedded accounting plus the complete financial reports module.
 
-**Product shape:** **`@paprel/embed-core`** provides shared auth and transport. **`@paprel/accounting`** is the complete accounting domain package, including its typed resources and embeddable Web Components. Future domains follow the same shape (`@paprel/sales`, `@paprel/purchases`, …). **`@paprel/ui`** owns the shared theme contract and is included by domain packages.
+**Product shape:** **`@paprel/embed-core`** provides shared auth and transport. **`@paprel/embed-accounting`** is the complete embedded accounting package, including its typed resources and Web Components. Future embedded domains follow the same shape (`@paprel/embed-sales`, `@paprel/embed-purchases`, …). **`@paprel/embed-ui`** owns the shared theme contract and is included by embed domain packages. The shorter `@paprel/*` names remain available for future non-embed SDKs.
 
 | Package | Description |
 |---------|-------------|
 | `@paprel/embed-core` | Shared HTTP client, App Connect token lifecycle, errors and primitives |
-| `@paprel/ui` | Semantic theme tokens and shared UI primitives |
-| `@paprel/accounting` | Operational accounting: accounts, journals, banking, transactions and reconciliation |
-| `@paprel/reports` | Complete reporting module: TB, BS, P&L, cash flow and general ledger |
+| `@paprel/embed-ui` | Semantic theme tokens and shared UI primitives |
+| `@paprel/embed-accounting` | Operational accounting: accounts, journals, banking, transactions and reconciliation |
+| `@paprel/embed-reports` | Complete reporting module: TB, BS, P&L, cash flow and general ledger |
 
 ## SDK development
 
@@ -39,7 +39,7 @@ Consumer examples now live in the dedicated [Paprel Embed examples repository](h
 Typical flow: App Connect client → partner `/api/embed-token` → `configureAccounting` → mount widgets.
 
 ```ts
-import { configureAccounting } from "@paprel/accounting";
+import { configureAccounting } from "@paprel/embed-accounting";
 
 configureAccounting({
   baseUrl: "https://api.paprel.com",
@@ -69,7 +69,7 @@ configureAccounting({
 
 Layer A: COA, account picker/form, journals. Layer B: reports, banking, transactions, matching, reconciliations. See the [component lab screen list](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab#screens).
 
-Theme via inherited semantic CSS variables (`--paprel-color-primary`, …) from `@paprel/ui`. No stylesheet import is required; override tokens on a wrapper or individual component.
+Theme via inherited semantic CSS variables (`--paprel-color-primary`, …) from `@paprel/embed-ui`. No stylesheet import is required; override tokens on a wrapper or individual component.
 
 ## Documentation
 
@@ -81,7 +81,7 @@ Theme via inherited semantic CSS variables (`--paprel-color-primary`, …) from 
 
 ## Publishing to npm
 
-Packages are `@paprel/embed-core`, `@paprel/ui`, `@paprel/accounting`, and `@paprel/reports` (public, version-linked via changesets). Publishing is **manual only** via [`.github/workflows/release.yml`](.github/workflows/release.yml) — dispatch from **`main`**.
+Packages are `@paprel/embed-core`, `@paprel/embed-ui`, `@paprel/embed-accounting`, and `@paprel/embed-reports` (public, version-linked via changesets). Publishing is **manual only** via [`.github/workflows/release.yml`](.github/workflows/release.yml) — dispatch from **`main`**.
 
 ### One-time npm setup
 
@@ -90,16 +90,16 @@ Packages are `@paprel/embed-core`, `@paprel/ui`, `@paprel/accounting`, and `@pap
    ```bash
    npm run lint && npm test && npm run pack:check && npm run consumer:check
    npm publish --provenance=false -w @paprel/embed-core
-   npm publish --provenance=false -w @paprel/ui
-   npm publish --provenance=false -w @paprel/accounting
-   npm publish --provenance=false -w @paprel/reports
+   npm publish --provenance=false -w @paprel/embed-ui
+   npm publish --provenance=false -w @paprel/embed-accounting
+   npm publish --provenance=false -w @paprel/embed-reports
    git tag @paprel/embed-core@0.1.0
-   git tag @paprel/ui@0.1.0
-   git tag @paprel/accounting@0.1.0
-   git tag @paprel/reports@0.1.0
+   git tag @paprel/embed-ui@0.1.0
+   git tag @paprel/embed-accounting@0.1.0
+   git tag @paprel/embed-reports@0.1.0
    git push origin --tags
    ```
-3. On npm, configure trusted publishing for all four packages, including `@paprel/reports`.
+3. On npm, configure trusted publishing for all four packages, including `@paprel/embed-reports`.
    - Organization / user: `nexara-global`
    - Repository: `paprel-embed-ui`
    - Workflow filename: `release.yml` (exact match, including extension)

@@ -46,8 +46,8 @@ try {
     join(consumerDir, "index.ts"),
     [
       'import type { EmbedTokenSet } from "@paprel/embed-core";',
-      'import { configureAccounting } from "@paprel/accounting/configure";',
-      'import "@paprel/reports";',
+      'import { configureAccounting } from "@paprel/embed-accounting/configure";',
+      'import "@paprel/embed-reports";',
       'const getTokens = async (): Promise<EmbedTokenSet> => ({ accessToken: "test", expiresAt: Date.now() + 60_000 });',
       'configureAccounting({ baseUrl: "https://api.example.test", auth: { partnerDomain: "partner.example.test", getTokens } });',
     ].join("\n"),

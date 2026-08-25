@@ -14,7 +14,7 @@ import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { isoDateField } from "../lib/iso-date-field.js";
 import { hasUnmappedValidation, validationMessages, withoutValidationField } from "../lib/form-validation.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 
 @customElement("paprel-journal-editor")
 export class PaprelJournalEditor extends LitElement {

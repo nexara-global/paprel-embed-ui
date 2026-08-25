@@ -1,8 +1,8 @@
-# @paprel/ui
+# @paprel/embed-ui
 
 Shared semantic CSS tokens and component chrome for Paprel domain packages.
 
-Domain packages such as `@paprel/accounting` include these styles automatically. Consumers only install this package directly when they want the standalone token stylesheet or future UI primitives.
+Domain packages such as `@paprel/embed-accounting` include these styles automatically. Consumers only install this package directly when they want the standalone token stylesheet or future UI primitives.
 
 Override semantic `--paprel-*` custom properties on a wrapper or individual component:
 

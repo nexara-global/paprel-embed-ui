@@ -22,4 +22,4 @@ export {
   type GeneralLedgerParams,
   type GeneralLedgerReport,
   type GeneralLedgerRow,
-} from "@paprel/accounting";
+} from "@paprel/embed-accounting";

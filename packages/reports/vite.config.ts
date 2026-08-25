@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     lib: { entry: { index: resolve(__dirname, "src/index.ts") }, formats: ["es"] },
     rollupOptions: {
-      external: ["lit", "@paprel/accounting", "@paprel/embed-core"],
+      external: ["lit", "@paprel/embed-accounting", "@paprel/embed-core"],
       output: { entryFileNames: "[name].js" },
     },
     cssCodeSplit: false,

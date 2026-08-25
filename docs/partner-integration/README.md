@@ -2,7 +2,7 @@
 
 Docs for integrating Paprel into your product.
 
-Install `@paprel/embed-core` for shared auth and transport plus the domain packages you need. `@paprel/accounting` contains the complete accounting integration, including typed resources and Web Components. Its UI inherits `@paprel/ui` theme variables automatically.
+Install `@paprel/embed-core` for shared auth and transport plus the domain packages you need. `@paprel/embed-accounting` contains the complete accounting integration, including typed resources and Web Components. Its UI inherits `@paprel/embed-ui` theme variables automatically.
 
 ## Start here
 
@@ -18,15 +18,15 @@ Install `@paprel/embed-core` for shared auth and transport plus the domain packa
 ## Packages
 
 ```bash
-npm install @paprel/embed-core @paprel/accounting @paprel/reports
+npm install @paprel/embed-core @paprel/embed-accounting @paprel/embed-reports
 ```
 
 | Package | Role |
 |---------|------|
 | `@paprel/embed-core` | Shared HTTP client, App Connect token lifecycle, errors and primitives |
-| `@paprel/accounting` | Complete accounting resources and Web Components |
-| `@paprel/reports` | Complete financial reports module; uses the shared accounting session |
-| `@paprel/ui` | Shared theme contract; installed transitively by domain packages |
+| `@paprel/embed-accounting` | Complete accounting resources and Web Components |
+| `@paprel/embed-reports` | Complete financial reports module; uses the shared accounting session |
+| `@paprel/embed-ui` | Shared theme contract; installed transitively by domain packages |
 
 ## Integration in three steps
 
@@ -38,7 +38,7 @@ npm install @paprel/embed-core @paprel/accounting @paprel/reports
 
 Embed v1 API slice (for codegen and AI context):
 
-- npm: `@paprel/accounting/openapi/openapi-embed-v1.json` (after `npm install @paprel/embed-core`)
+- npm: `@paprel/embed-accounting/openapi/openapi-embed-v1.json` (after `npm install @paprel/embed-core`)
 - Full gateway spec: [paprel.com API documentation](https://paprel.com/api-documentation)
 
 The slice is versioned with the package so consumer tooling always matches the installed SDK release.

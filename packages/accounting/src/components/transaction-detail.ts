@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import { formatJournalAmount, type TransactionDetail } from "../headless.js";
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 
 @customElement("paprel-transaction-detail")
 export class PaprelTransactionDetail extends LitElement {

@@ -6,11 +6,11 @@ import {
   formatJournalAmount,
   parseDateRangeParam,
   type GeneralLedgerRow,
-} from "@paprel/accounting";
-import { getEmbedClient, getEmbedI18n } from "@paprel/accounting";
+} from "@paprel/embed-accounting";
+import { getEmbedClient, getEmbedI18n } from "@paprel/embed-accounting";
 import { isoDateField } from "../lib/iso-date-field.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 
 @customElement("paprel-general-ledger")
 export class PaprelGeneralLedger extends LitElement {

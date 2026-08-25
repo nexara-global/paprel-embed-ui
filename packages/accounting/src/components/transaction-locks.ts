@@ -1,6 +1,6 @@
 import { css, html, LitElement, nothing, unsafeCSS } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 import { getEmbedClient } from "../context.js";
 import { PaprelApiError } from "../headless.js";
 import { todayIsoDate } from "../iso-date.js";

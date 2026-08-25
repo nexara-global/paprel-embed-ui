@@ -1,19 +1,19 @@
-# @paprel/accounting
+# @paprel/embed-accounting
 
-Embedded Paprel operational accounting — typed resources and Web Components for COA, journals, banking, transactions, and reconciliation. Financial report components ship together in `@paprel/reports`.
+Embedded Paprel operational accounting — typed resources and Web Components for COA, journals, banking, transactions, and reconciliation. Financial report components ship together in `@paprel/embed-reports`.
 
 The list components emit the shared `paprel:view-change` and `paprel:resource-open` events exported by `@paprel/embed-core`. The host can use one delegated listener to synchronize search, filters, tabs, and pagination with its router and to open resource pages. Paprel does not require or install a router.
 
 ## Install
 
 ```bash
-npm install @paprel/embed-core @paprel/accounting
+npm install @paprel/embed-core @paprel/embed-accounting
 ```
 
 ## Quick start
 
 ```ts
-import { configureAccounting } from "@paprel/accounting";
+import { configureAccounting } from "@paprel/embed-accounting";
 
 configureAccounting({
   baseUrl: "", // same-origin /v1 proxy, or https://api.paprel.com
@@ -57,11 +57,11 @@ Override inherited semantic variables on a wrapper:
 }
 ```
 
-See `@paprel/ui` for the shared token contract. Importing `@paprel/ui/styles.css` directly is optional.
+See `@paprel/embed-ui` for the shared token contract. Importing `@paprel/embed-ui/styles.css` directly is optional.
 
 ## OpenAPI
 
-The versioned accounting API slice ships at `@paprel/accounting/openapi/openapi-embed-v1.json` for tooling and integration reference.
+The versioned accounting API slice ships at `@paprel/embed-accounting/openapi/openapi-embed-v1.json` for tooling and integration reference.
 
 ## Documentation
 

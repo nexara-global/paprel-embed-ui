@@ -5,7 +5,7 @@ import {
   todayIsoDate,
   type EmbedI18n,
   type ReportDisplayRow,
-} from "@paprel/accounting";
+} from "@paprel/embed-accounting";
 
 export function renderStatementTable(
   rows: ReportDisplayRow[],

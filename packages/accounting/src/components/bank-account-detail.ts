@@ -14,7 +14,7 @@ import "./transaction-match-sheet.js";
 import "./reconciliation-list.js";
 import "./reconciliation-detail.js";
 import "./reconciliation-form.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 
 @customElement("paprel-bank-account-detail")
 export class PaprelBankAccountDetail extends LitElement {

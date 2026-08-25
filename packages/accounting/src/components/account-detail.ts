@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import { accountI18nKey, accountPickerMetaLabel, formatJournalAmount, type BankingAccount } from "../headless.js";
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import "./bank-account-detail.js";
-import sharedStyles from "@paprel/ui/styles.css?inline";
+import sharedStyles from "@paprel/embed-ui/styles.css?inline";
 
 @customElement("paprel-account-detail")
 export class PaprelAccountDetail extends LitElement {
