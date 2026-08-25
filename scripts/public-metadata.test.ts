@@ -45,4 +45,22 @@ describe("public package metadata", () => {
       assert.doesNotMatch(content, /handbook\/|component[ -]lab|paprel-embed-ui-examples\/(?:blob|tree)\/main\/shared/, file);
     }
   });
+
+  it("keeps beta packages aligned and makes untagged installs resolve the current beta", () => {
+    const rootPackage = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as {
+      scripts: Record<string, string>;
+    };
+    const versions = ["core", "ui", "accounting", "reports"].map((name) => {
+      const manifest = JSON.parse(readFileSync(new URL(`../packages/${name}/package.json`, import.meta.url), "utf8")) as {
+        version: string;
+        publishConfig?: { tag?: string };
+      };
+      assert.equal(manifest.publishConfig?.tag, undefined);
+      return manifest.version;
+    });
+    assert.ok(versions.every((version) => version === versions[0]), versions.join(", "));
+    assert.match(versions[0], /^\d+\.\d+\.\d+-beta\.\d+$/);
+    assert.match(rootPackage.scripts.release, /changeset publish$/);
+    assert.doesNotMatch(rootPackage.scripts.release, /--tag/);
+  });
 });
