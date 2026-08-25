@@ -4,10 +4,12 @@ export { PaprelApiError, parseEnvelope, type ApiFieldErrors } from "./errors.js"
 export { createHttpClient, HttpClient, type HttpMethod } from "./http.js";
 export {
   dispatchPaprelResourceOpen,
+  dispatchPaprelOperationSuccess,
   dispatchPaprelViewChange,
   PAPREL_EVENTS,
   PAPREL_EVENT_VERSION,
   type PaprelEventSource,
+  type PaprelOperationSuccessDetail,
   type PaprelResourceOpenDetail,
   type PaprelViewChangeDetail,
   type PaprelViewChangeReason,

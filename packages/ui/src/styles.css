@@ -548,7 +548,8 @@ h3 .status-pill {
 /* ── Ledger UI (framework-agnostic) ───────────────────────── */
 
 .ledger-empty,
-.ledger-error {
+.ledger-error,
+.ledger-success {
   padding: 1.5rem 0.75rem;
   font-size: 0.875rem;
   color: var(--paprel-color-muted, #78786f);
@@ -557,6 +558,16 @@ h3 .status-pill {
 
 .ledger-error {
   color: var(--paprel-color-danger, #dc2626);
+}
+
+.ledger-success {
+  color: var(--paprel-color-success, #059669);
+  background: color-mix(in srgb, var(--paprel-color-success, #059669) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--paprel-color-success, #059669) 25%, transparent);
+  border-radius: var(--paprel-radius-sm, 10px);
+  padding: 0.75rem 0.875rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .ledger-id {

@@ -15,6 +15,7 @@ import { isoDateField } from "../lib/iso-date-field.js";
 import { hasUnmappedValidation, validationMessages, withoutValidationField } from "../lib/form-validation.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import sharedStyles from "@paprel/embed-ui/styles.css?inline";
+import { dispatchPaprelOperationSuccess } from "@paprel/embed-core";
 
 @customElement("paprel-journal-editor")
 export class PaprelJournalEditor extends LitElement {
@@ -46,6 +47,7 @@ export class PaprelJournalEditor extends LitElement {
   @state() private saving = false;
   @state() private loading = false;
   @state() private error = "";
+  @state() private success = "";
   @state() private clientErrors: Record<string, string> = {};
   @state() private fieldErrors: Record<string, string[]> = {};
   @state() private versionNumber?: number;
@@ -175,6 +177,7 @@ export class PaprelJournalEditor extends LitElement {
     const lines = [...this.form.lines];
     lines[index] = { ...lines[index], ...patch };
     this.form = { ...this.form, lines };
+    this.success = "";
     for (const field of Object.keys(patch)) this.clearFieldError(`lines_${index}_${field}`);
   }
 
@@ -206,6 +209,7 @@ export class PaprelJournalEditor extends LitElement {
   private async save(): Promise<void> {
     this.saving = true;
     this.error = "";
+    this.success = "";
     this.clientErrors = {};
     this.fieldErrors = {};
 
@@ -225,6 +229,13 @@ export class PaprelJournalEditor extends LitElement {
       const result = this.effectiveMode() === "edit" && this.journalId
         ? await client.journals.update(this.journalId, payload)
         : await client.journals.create(payload);
+      this.success = this.effectiveMode() === "edit" ? "Journal updated successfully." : "Journal created successfully.";
+      dispatchPaprelOperationSuccess(this, {
+        source: { component: "paprel-journal-editor" },
+        action: this.effectiveMode() === "edit" ? "journal.updated" : "journal.created",
+        message: this.success,
+        resource: { type: "journal", id: result.id ? String(result.id) : undefined },
+      });
       this.dispatchEvent(
         new CustomEvent("journal-saved", { detail: { journal: result }, bubbles: true, composed: true }),
       );
@@ -263,6 +274,7 @@ export class PaprelJournalEditor extends LitElement {
         </div>
 
         ${this.error ? html`<div class="ledger-error">${this.error}</div>` : null}
+        ${this.success ? html`<div class="ledger-success" role="status">${this.success}</div>` : null}
         ${Object.keys(this.clientErrors).length
           ? html`<div class="ledger-field-errors">
               ${Object.values(this.clientErrors).map((code) => html`<div>${this.validationMessage(code)}</div>`)}

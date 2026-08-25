@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   dispatchPaprelResourceOpen,
+  dispatchPaprelOperationSuccess,
   dispatchPaprelViewChange,
   PAPREL_EVENTS,
 } from "./events.js";
@@ -39,5 +40,26 @@ describe("Paprel host events", () => {
     });
 
     assert.equal(accepted, false);
+  });
+
+  it("emits a versioned operation success message", () => {
+    const target = new EventTarget();
+    let received: CustomEvent | undefined;
+    target.addEventListener(PAPREL_EVENTS.operationSuccess, (event) => { received = event as CustomEvent; });
+
+    dispatchPaprelOperationSuccess(target, {
+      source: { component: "paprel-account-form" },
+      action: "account.updated",
+      message: "Account saved successfully.",
+      resource: { type: "account", id: "account-1" },
+    });
+
+    assert.deepEqual(received?.detail, {
+      version: 1,
+      source: { component: "paprel-account-form" },
+      action: "account.updated",
+      message: "Account saved successfully.",
+      resource: { type: "account", id: "account-1" },
+    });
   });
 });
