@@ -1,6 +1,6 @@
 /**
  * Paprel embed UI — shared design tokens and component chrome.
- * Defaults match the Paprel / Newledger workspace theme (Warm White).
+ * Defaults match the Paprel workspace theme (Warm White).
  * Partners override via CSS custom properties on a wrapper (.paprel-shell).
  */
 
