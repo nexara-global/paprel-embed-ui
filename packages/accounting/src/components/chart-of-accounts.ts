@@ -121,8 +121,9 @@ export class PaprelChartOfAccounts extends LitElement {
       .coa-toolbar {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         gap: 0.75rem;
-        margin: 0;
+        margin: 0 0 0.75rem;
       }
 
       @media (max-width: 520px) {
@@ -323,22 +324,19 @@ export class PaprelChartOfAccounts extends LitElement {
     }
 
     return html`
-      <section class="paprel-panel">
-        <header class="paprel-panel-header">
-          <div><h2 class="paprel-panel-title">Chart of accounts</h2><p class="paprel-panel-description">Your ledger structure, balances, and account classifications.</p></div>
-          <div class="coa-toolbar">
-            <label class="field checkbox-inline">
-              <input
-                type="checkbox"
-                .checked=${this.showArchived}
-                @change=${(e: Event) => {
-                  this.showArchived = (e.target as HTMLInputElement).checked;
-                }}
-              />
-              ${i18n.t("showArchived")}
-            </label>
-          </div>
-        </header>
+      <div class="coa-list">
+        <div class="coa-toolbar">
+          <label class="field checkbox-inline">
+            <input
+              type="checkbox"
+              .checked=${this.showArchived}
+              @change=${(e: Event) => {
+                this.showArchived = (e.target as HTMLInputElement).checked;
+              }}
+            />
+            ${i18n.t("showArchived")}
+          </label>
+        </div>
         ${this.useFlatList ? this.renderFlatGrid() : html`
         <div class="coa-tree-wrap">
         <table>
@@ -352,7 +350,7 @@ export class PaprelChartOfAccounts extends LitElement {
           <tbody>${this.renderTree(this.treeNodes)}</tbody>
         </table>
         </div>`}
-      </section>
+      </div>
     `;
   }
 }
