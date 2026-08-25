@@ -10,6 +10,7 @@ import {
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import sharedStyles from "@paprel/ui/styles.css?inline";
+import { dispatchPaprelResourceOpen } from "@paprel/embed-core";
 
 @customElement("paprel-chart-of-accounts")
 export class PaprelChartOfAccounts extends LitElement {
@@ -212,6 +213,12 @@ export class PaprelChartOfAccounts extends LitElement {
   }
 
   private open(account: BankingAccount): void {
+    const useDefault = dispatchPaprelResourceOpen(this, {
+      source: { component: this.localName },
+      resource: "account",
+      id: account.id,
+    });
+    if (!useDefault) return;
     this.dispatchEvent(new CustomEvent("account-select", {
       detail: { accountId: account.id, account },
       bubbles: true,
