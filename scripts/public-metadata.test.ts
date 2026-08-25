@@ -42,7 +42,7 @@ describe("public package metadata", () => {
     const files = [join(repoPath, "README.md"), ...markdownFiles(join(repoPath, "docs")), ...markdownFiles(join(repoPath, "packages"))];
     for (const file of files) {
       const content = readFileSync(file, "utf8");
-      assert.doesNotMatch(content, /handbook\/|apps\/component-lab|shared\/dev-token-bff/, file);
+      assert.doesNotMatch(content, /handbook\/|component[ -]lab|paprel-embed-ui-examples\/(?:blob|tree)\/main\/shared/, file);
     }
   });
 });

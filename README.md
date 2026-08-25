@@ -34,7 +34,7 @@ Consumer examples now live in the dedicated [Paprel Embed examples repository](h
 | Why you need a BFF | [Build your BFF](https://paprel.com/documentation/embedded-ui/build-bff) |
 | Token route contract (for humans + AI) | [`docs/partner-integration/bff-contract.md`](docs/partner-integration/bff-contract.md) |
 | Cursor / Claude / Codex prompts | [`docs/prompts/README.md`](docs/prompts/README.md) — attach OpenAPI slice + `build-embed-bff.md` |
-| Reference BFF (dev) | [Paprel Embed examples](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/shared) |
+| Reference BFF (dev) | [Real-estate example BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/real-estate-accounting/server/embed-token-bff.ts) |
 
 Typical flow: App Connect client → partner `/api/embed-token` → `configureAccounting` → mount widgets.
 
@@ -122,7 +122,7 @@ The local first publish is the only exception: it uses your interactive npm main
 
 The initial `0.1.0` release can be published directly after this repository is created because those versions are already committed. Subsequent releases should consume their changesets through a version pull request first.
 
-Before the first publish, run the standalone component lab against staging from the [Paprel Embed examples repository](https://github.com/nexara-global/paprel-embed-ui-examples) using an ignored `.env.local` file.
+Before the first publish, run the framework-neutral [real-estate accounting reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) against staging using an ignored `.env.local` file.
 
 ## Community and license
 
