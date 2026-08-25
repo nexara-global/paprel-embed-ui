@@ -155,6 +155,10 @@ export class PaprelTransactionMatchSheet extends LitElement {
 
   private async confirm(match: TransactionMatch): Promise<void> {
     if (!this.transaction || this.confirming) return;
+    const label = this.matchLabel(match) || "the selected document";
+    const amount = this.matchAmount(match);
+    const accepted = window.confirm(`Confirm matching this transaction to ${label} (${amount})?`);
+    if (!accepted) return;
     this.confirming = true;
     this.actionError = "";
     try {
