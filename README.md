@@ -27,14 +27,14 @@ Consumer examples now live in the dedicated [Paprel Embed examples repository](h
 
 ## Partner integration
 
-**Start here:** [`docs/partner-integration/README.md`](docs/partner-integration/README.md) — BFF contract, security model, and links to handbook.
+**Start here:** [`docs/partner-integration/README.md`](docs/partner-integration/README.md) — BFF contract, security model, and public integration references.
 
 | Goal | Doc |
 |------|-----|
 | Why you need a BFF | [Build your BFF](https://paprel.com/documentation/embedded-ui/build-bff) |
 | Token route contract (for humans + AI) | [`docs/partner-integration/bff-contract.md`](docs/partner-integration/bff-contract.md) |
 | Cursor / Claude / Codex prompts | [`docs/prompts/README.md`](docs/prompts/README.md) — attach OpenAPI slice + `build-embed-bff.md` |
-| Reference BFF (dev) | [Paprel Embed examples](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/shared) |
+| Reference BFF (dev) | [Real-estate example BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/real-estate-accounting/server/embed-token-bff.ts) |
 
 Typical flow: App Connect client → partner `/api/embed-token` → `configureAccounting` → mount widgets.
 
@@ -67,7 +67,7 @@ configureAccounting({
 
 ## Web Components (v1)
 
-Layer A: COA, account picker/form, journals. Layer B: reports, banking, transactions, matching, reconciliations. See the [component lab screen list](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab#screens).
+Layer A: COA, account picker/form, journals. Layer B: reports, banking, transactions, matching, reconciliations. See the [framework-neutral reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting).
 
 Theme via inherited semantic CSS variables (`--paprel-color-primary`, …) from `@paprel/embed-ui`. No stylesheet import is required; override tokens on a wrapper or individual component.
 
@@ -122,7 +122,7 @@ The local first publish is the only exception: it uses your interactive npm main
 
 The initial `0.1.0` release can be published directly after this repository is created because those versions are already committed. Subsequent releases should consume their changesets through a version pull request first.
 
-Before the first publish, run the standalone component lab against staging from the [Paprel Embed examples repository](https://github.com/nexara-global/paprel-embed-ui-examples) using an ignored `.env.local` file.
+Before the first publish, run the framework-neutral [real-estate accounting reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) against staging using an ignored `.env.local` file.
 
 ## Community and license
 

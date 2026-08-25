@@ -130,11 +130,7 @@ export class PaprelJournalList extends LitElement {
       }
 
       .journal-filter-bar {
-        margin-bottom: 1rem;
-        padding: 0.75rem;
-        border: 1px solid var(--paprel-color-border-subtle, #f0f0eb);
-        border-radius: var(--paprel-radius-sm, 10px);
-        background: color-mix(in srgb, var(--paprel-color-surface-muted, #f7f7f4) 55%, white);
+        margin-bottom: 0.875rem;
       }
 
       .journal-filter-bar .ledger-filters { margin: 0; }
@@ -398,11 +394,7 @@ export class PaprelJournalList extends LitElement {
   render() {
     const i18n = getEmbedI18n();
     return html`
-      <section class="paprel-panel">
-      <header class="paprel-panel-header">
-        <div><h2 class="paprel-panel-title">Journals</h2><p class="paprel-panel-description">Review posted entries, drafts, references, and ledger adjustments.</p></div>
-        ${!this.loading && !this.error ? html`<span class="journal-count">${i18n.t("journalCount", { count: this.totalRecords })}</span>` : null}
-      </header>
+      <div class="journal-list">
       <div class="journal-filter-bar">${this.filters()}</div>
       ${this.loading ? html`<div class="state-loading">${i18n.t("loadingJournals")}</div>` : null}
       ${this.error ? html`<div class="error">${this.error}</div>` : null}
@@ -410,6 +402,7 @@ export class PaprelJournalList extends LitElement {
       ${!this.loading && !this.error && this.rows.length ? html`
       <div class="journal-toolbar">
         <span>Entries are ordered by journal date.</span>
+        <span class="journal-count">${i18n.t("journalCount", { count: this.totalRecords })}</span>
       </div>
       <div class="ledger-table-wrap journal-table-wrap">
         <table class="journal-table">
@@ -461,7 +454,7 @@ export class PaprelJournalList extends LitElement {
         </table>
       </div>
       ` : null}
-      </section>
+      </div>
     `;
   }
 }

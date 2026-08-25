@@ -103,5 +103,5 @@ Accounting GETs: **do not** add `company_id` query param — tenant comes from J
 
 ## Reference implementations
 
-- Dev: [standalone example token BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/shared/dev-token-bff.ts)
+- Dev: [reference example token BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/real-estate-accounting/server/embed-token-bff.ts)
 - Prompts: [`docs/prompts/bff-express.md`](../prompts/bff-express.md), [`bff-nextjs.md`](../prompts/bff-nextjs.md)

@@ -30,5 +30,5 @@ When asking an agent to build integration from scratch, provide:
 
 ## After generation
 
-- Compare output to the [standalone example BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/shared/dev-token-bff.ts)
-- Smoke with the [Paprel Embed component lab](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab)
+- Compare output to the [reference BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/real-estate-accounting/server/embed-token-bff.ts)
+- Smoke with the [framework-neutral reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting)

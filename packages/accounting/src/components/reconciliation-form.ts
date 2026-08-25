@@ -6,6 +6,7 @@ import { hasUnmappedValidation, validationMessages, withoutValidationField } fro
 import { isoDateField } from "../lib/iso-date-field.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import sharedStyles from "@paprel/embed-ui/styles.css?inline";
+import { dispatchPaprelOperationSuccess } from "@paprel/embed-core";
 
 @customElement("paprel-reconciliation-form")
 export class PaprelReconciliationForm extends LitElement {
@@ -15,6 +16,7 @@ export class PaprelReconciliationForm extends LitElement {
   @property({ type: String }) currency = "";
   @state() private saving = false;
   @state() private error = "";
+  @state() private success = "";
   @state() private fieldErrors: Record<string, string[]> = {};
   @state() private startDate = "";
   @state() private endDate = "";
@@ -52,6 +54,7 @@ export class PaprelReconciliationForm extends LitElement {
 
     this.saving = true;
     this.error = "";
+    this.success = "";
     this.fieldErrors = {};
     try {
       const record = await getEmbedClient().reconciliations.create({
@@ -60,6 +63,13 @@ export class PaprelReconciliationForm extends LitElement {
         end_date: this.endDate,
         opening_balance: this.openingBalance || undefined,
         closing_balance: this.closingBalance,
+      });
+      this.success = getEmbedI18n().t("reconciliationCreatedSuccess");
+      dispatchPaprelOperationSuccess(this, {
+        source: { component: "paprel-reconciliation-form" },
+        action: "reconciliation.created",
+        message: this.success,
+        resource: { type: "reconciliation", id: record.id ? String(record.id) : undefined },
       });
       this.dispatchEvent(
         new CustomEvent("reconciliation-created", {
@@ -96,6 +106,7 @@ export class PaprelReconciliationForm extends LitElement {
           <label class="field">${i18n.t("dateFrom")}
             ${isoDateField(this.startDate, (value) => {
               this.startDate = value;
+              this.success = "";
               this.clearFieldError("start_date");
             }, { required: true })}
             ${this.fieldFeedback("start_date")}
@@ -103,6 +114,7 @@ export class PaprelReconciliationForm extends LitElement {
           <label class="field">${i18n.t("dateTo")}
             ${isoDateField(this.endDate, (value) => {
               this.endDate = value;
+              this.success = "";
               this.clearFieldError("end_date");
             }, { required: true })}
             ${this.fieldFeedback("end_date")}
@@ -110,6 +122,7 @@ export class PaprelReconciliationForm extends LitElement {
           <label class="field">${i18n.t("openingBalance")}
             <input aria-invalid=${this.errorsFor("opening_balance").length ? "true" : "false"} type="text" inputmode="decimal" .value=${this.openingBalance} @input=${(e: Event) => {
               this.openingBalance = (e.target as HTMLInputElement).value;
+              this.success = "";
               this.clearFieldError("opening_balance");
             }} />
             ${this.fieldFeedback("opening_balance")}
@@ -117,6 +130,7 @@ export class PaprelReconciliationForm extends LitElement {
           <label class="field">${i18n.t("closingBalance")}
             <input aria-invalid=${this.errorsFor("closing_balance").length ? "true" : "false"} type="text" inputmode="decimal" required .value=${this.closingBalance} @input=${(e: Event) => {
               this.closingBalance = (e.target as HTMLInputElement).value;
+              this.success = "";
               this.clearFieldError("closing_balance");
             }} />
             ${this.fieldFeedback("closing_balance")}
@@ -124,6 +138,7 @@ export class PaprelReconciliationForm extends LitElement {
         </div>
 
         ${this.error ? html`<div class="ledger-error">${this.error}</div>` : null}
+        ${this.success ? html`<div class="ledger-success" role="status">${this.success}</div>` : null}
 
         <div class="ledger-actions">
           <button type="submit" class="primary" ?disabled=${this.saving}>

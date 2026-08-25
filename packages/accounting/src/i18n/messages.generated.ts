@@ -157,6 +157,8 @@ export const EMBED_LOCALE_MESSAGES = {
       "loadingMatches": "Loading suggested matches…",
       "noSuggestedMatches": "No suggested matches for this transaction.",
       "confirmMatch": "Confirm match",
+      "confirmMatchPrompt": "Confirm matching this transaction to {label} for {amount}?",
+      "selectedDocument": "the selected document",
       "matchScore": "Score {score}",
       "excludeTransaction": "Exclude",
       "restoreTransaction": "Restore",
@@ -177,7 +179,13 @@ export const EMBED_LOCALE_MESSAGES = {
       "voidReconciliationPrompt": "Reason for voiding (optional)",
       "reconciliationLines": "Reconciliation lines",
       "noReconciliationLines": "No journal lines in this reconciliation.",
-      "createReconciliation": "Create reconciliation"
+      "createReconciliation": "Create reconciliation",
+      "accountCreatedSuccess": "Account created successfully.",
+      "accountUpdatedSuccess": "Account updated successfully.",
+      "journalCreatedSuccess": "Journal created successfully.",
+      "journalUpdatedSuccess": "Journal updated successfully.",
+      "reconciliationCreatedSuccess": "Reconciliation created successfully.",
+      "transactionLockCreatedSuccess": "Transaction lock created successfully."
     }
   },
   "ko": {
@@ -337,6 +345,8 @@ export const EMBED_LOCALE_MESSAGES = {
       "loadingMatches": "추천 매칭 불러오는 중…",
       "noSuggestedMatches": "이 거래에 대한 추천 매칭이 없습니다.",
       "confirmMatch": "매칭 확인",
+      "confirmMatchPrompt": "이 거래를 {label}에 {amount} 금액으로 매칭하시겠습니까?",
+      "selectedDocument": "선택한 문서",
       "matchScore": "점수 {score}",
       "excludeTransaction": "제외",
       "restoreTransaction": "복원",
@@ -357,7 +367,13 @@ export const EMBED_LOCALE_MESSAGES = {
       "voidReconciliationPrompt": "무효 사유 (선택)",
       "reconciliationLines": "조정 라인",
       "noReconciliationLines": "이 조정에 분개 라인이 없습니다.",
-      "createReconciliation": "조정 생성"
+      "createReconciliation": "조정 생성",
+      "accountCreatedSuccess": "계정이 생성되었습니다.",
+      "accountUpdatedSuccess": "계정이 업데이트되었습니다.",
+      "journalCreatedSuccess": "분개가 생성되었습니다.",
+      "journalUpdatedSuccess": "분개가 업데이트되었습니다.",
+      "reconciliationCreatedSuccess": "조정이 생성되었습니다.",
+      "transactionLockCreatedSuccess": "거래 잠금이 생성되었습니다."
     }
   },
   "es": {
@@ -517,6 +533,8 @@ export const EMBED_LOCALE_MESSAGES = {
       "loadingMatches": "Cargando coincidencias sugeridas…",
       "noSuggestedMatches": "No hay coincidencias sugeridas para esta transacción.",
       "confirmMatch": "Confirmar coincidencia",
+      "confirmMatchPrompt": "¿Confirmar la asociación de esta transacción con {label} por {amount}?",
+      "selectedDocument": "el documento seleccionado",
       "matchScore": "Puntuación {score}",
       "excludeTransaction": "Excluir",
       "restoreTransaction": "Restaurar",
@@ -537,7 +555,13 @@ export const EMBED_LOCALE_MESSAGES = {
       "voidReconciliationPrompt": "Motivo de anulación (opcional)",
       "reconciliationLines": "Líneas de conciliación",
       "noReconciliationLines": "No hay líneas de asiento en esta conciliación.",
-      "createReconciliation": "Crear conciliación"
+      "createReconciliation": "Crear conciliación",
+      "accountCreatedSuccess": "Cuenta creada correctamente.",
+      "accountUpdatedSuccess": "Cuenta actualizada correctamente.",
+      "journalCreatedSuccess": "Diario creado correctamente.",
+      "journalUpdatedSuccess": "Diario actualizado correctamente.",
+      "reconciliationCreatedSuccess": "Conciliación creada correctamente.",
+      "transactionLockCreatedSuccess": "Bloqueo de transacciones creado correctamente."
     }
   },
   "ru": {
@@ -697,6 +721,8 @@ export const EMBED_LOCALE_MESSAGES = {
       "loadingMatches": "Загрузка предложенных совпадений…",
       "noSuggestedMatches": "Для этой транзакции нет предложенных совпадений.",
       "confirmMatch": "Подтвердить совпадение",
+      "confirmMatchPrompt": "Сопоставить эту транзакцию с {label} на сумму {amount}?",
+      "selectedDocument": "выбранным документом",
       "matchScore": "Оценка {score}",
       "excludeTransaction": "Исключить",
       "restoreTransaction": "Восстановить",
@@ -717,7 +743,13 @@ export const EMBED_LOCALE_MESSAGES = {
       "voidReconciliationPrompt": "Причина аннулирования (необязательно)",
       "reconciliationLines": "Строки сверки",
       "noReconciliationLines": "В этой сверке нет строк проводок.",
-      "createReconciliation": "Создать сверку"
+      "createReconciliation": "Создать сверку",
+      "accountCreatedSuccess": "Счёт успешно создан.",
+      "accountUpdatedSuccess": "Счёт успешно обновлён.",
+      "journalCreatedSuccess": "Проводка успешно создана.",
+      "journalUpdatedSuccess": "Проводка успешно обновлена.",
+      "reconciliationCreatedSuccess": "Сверка успешно создана.",
+      "transactionLockCreatedSuccess": "Блокировка транзакций успешно создана."
     }
   }
 } as const;

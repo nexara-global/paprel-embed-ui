@@ -90,7 +90,7 @@ For production, add `rewrites` in `next.config.js` to proxy `/v1/:path*` → Pap
 
 ## Reference
 
-- `paprel-embed-ui-examples/shared/dev-token-bff.ts`
+- `paprel-embed-ui-examples/apps/real-estate-accounting/server/embed-token-bff.ts`
 - Wire widgets: `paprel-embed/docs/prompts/wire-embed-widgets.md`
 
 ---

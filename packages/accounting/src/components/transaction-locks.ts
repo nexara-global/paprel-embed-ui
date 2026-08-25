@@ -1,11 +1,12 @@
 import { css, html, LitElement, nothing, unsafeCSS } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import sharedStyles from "@paprel/embed-ui/styles.css?inline";
-import { getEmbedClient } from "../context.js";
+import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { PaprelApiError } from "../headless.js";
 import { todayIsoDate } from "../iso-date.js";
 import { hasUnmappedValidation, validationMessages, withoutValidationField } from "../lib/form-validation.js";
 import type { TransactionLock, TransactionLockForm, TransactionLockLevel } from "../types.js";
+import { dispatchPaprelOperationSuccess } from "@paprel/embed-core";
 
 type StatusFilter = "ACTIVE" | "RELEASED" | "ALL";
 
@@ -13,11 +14,9 @@ type StatusFilter = "ACTIVE" | "RELEASED" | "ALL";
 export class PaprelTransactionLocks extends LitElement {
   static styles = [css`${unsafeCSS(sharedStyles)}`, css`
     :host { display: block; }
-    .toolbar, .filters, .actions { display:flex; gap:.65rem; align-items:center; flex-wrap:wrap; }
-    .toolbar { justify-content:space-between; margin-bottom:1rem; }
-    .intro strong { display:block; font-size:1rem; }
-    .intro span { color:var(--paprel-color-text-muted,#6b7280); font-size:.85rem; }
-    .filters button { padding:.45rem .8rem; border-radius:999px; }
+    .filters, .actions { display:flex; gap:.35rem; align-items:center; flex-wrap:wrap; }
+    .filters { margin-bottom:.75rem; }
+    .filters button { min-height:1.9rem; padding:.25rem .65rem; border-radius:999px; font-size:.75rem; }
     .filters button[aria-pressed="true"] { color:var(--paprel-color-primary,#4f46e5); border-color:currentColor; background:var(--paprel-color-primary-soft,#eef2ff); }
     .lock-table tbody tr { cursor:pointer; }
     .lock-table tbody tr:hover { background:var(--paprel-color-surface-muted,#f7f7f4); }
@@ -49,6 +48,7 @@ export class PaprelTransactionLocks extends LitElement {
   @state() private loading = true;
   @state() private acting = false;
   @state() private error = "";
+  @state() private success = "";
   @state() private fieldErrors: Record<string, string[]> = {};
   @state() private rows: TransactionLock[] = [];
   @state() private status: StatusFilter = "ACTIVE";
@@ -64,6 +64,12 @@ export class PaprelTransactionLocks extends LitElement {
 
   async refresh(): Promise<void> { await this.load(); }
 
+  openCreate(): void {
+    this.selected=null;
+    this.success="";
+    this.showForm=true;
+  }
+
   private async load(): Promise<void> {
     this.loading=true; this.error="";
     try {
@@ -75,6 +81,7 @@ export class PaprelTransactionLocks extends LitElement {
 
   private updateForm(field: keyof TransactionLockForm, event: Event): void {
     this.form={...this.form,[field]:(event.target as HTMLInputElement).value};
+    this.success="";
     this.fieldErrors=withoutValidationField(this.fieldErrors,field);
   }
 
@@ -82,9 +89,11 @@ export class PaprelTransactionLocks extends LitElement {
   private fieldFeedback(field: string) { const messages=this.errorsFor(field); return messages.length?html`<span class="control-error" role="alert">${messages.join(" ")}</span>`:nothing; }
 
   private async createLock(event: SubmitEvent): Promise<void> {
-    event.preventDefault(); this.acting=true; this.error=""; this.fieldErrors={};
+    event.preventDefault(); this.acting=true; this.error=""; this.success=""; this.fieldErrors={};
     try {
-      await getEmbedClient().transactionLocks.create({...this.form,lock_to_date:this.form.lock_to_date || null,external_ref_id:this.form.external_ref_id || null});
+      const record=await getEmbedClient().transactionLocks.create({...this.form,lock_to_date:this.form.lock_to_date || null,external_ref_id:this.form.external_ref_id || null});
+      this.success=getEmbedI18n().t("transactionLockCreatedSuccess");
+      dispatchPaprelOperationSuccess(this,{source:{component:"paprel-transaction-locks"},action:"transaction-lock.created",message:this.success,resource:{type:"transaction-lock",id:record.id?String(record.id):undefined}});
       this.form=this.emptyForm(); this.showForm=false; await this.load();
     } catch(error) {
       if(error instanceof PaprelApiError) {
@@ -129,9 +138,8 @@ export class PaprelTransactionLocks extends LitElement {
     <div class="form-actions">${row.status === "ACTIVE" ? html`<button class="secondary" ?disabled=${this.acting} @click=${()=>this.act("level")}>Make ${row.lock_level === "HARD" ? "soft" : "hard"}</button><button class="secondary" ?disabled=${this.acting} @click=${()=>this.act("release")}>Release</button><button class="secondary" ?disabled=${this.acting} @click=${()=>this.act("void")}>Void</button>` : html`<button class="primary" ?disabled=${this.acting} @click=${()=>this.act("reactivate")}>Reactivate</button>`}</div>
   </section>`; }
 
-  render() { return html`<div class="toolbar"><div class="intro"><strong>Transaction locks</strong><span>Control changes to closed or reviewed accounting periods.</span></div><button class="primary" @click=${()=>{this.selected=null;this.showForm=true}}>New lock</button></div>
-    <div class="filters">${(["ACTIVE","RELEASED","ALL"] as StatusFilter[]).map(value=>html`<button class="secondary" aria-pressed=${this.status===value} @click=${()=>{this.status=value;void this.load()}}>${value[0]+value.slice(1).toLowerCase()}</button>`)}</div>
-    ${this.error?html`<div class="error">${this.error}</div>`:nothing}${this.showForm?this.renderForm():nothing}${this.selected?this.renderDetail():nothing}
+  render() { return html`<div class="filters" aria-label="Transaction lock status">${(["ACTIVE","RELEASED","ALL"] as StatusFilter[]).map(value=>html`<button class="secondary" aria-pressed=${this.status===value} @click=${()=>{this.status=value;void this.load()}}>${value[0]+value.slice(1).toLowerCase()}</button>`)}</div>
+    ${this.error?html`<div class="error">${this.error}</div>`:nothing}${this.success?html`<div class="ledger-success" role="status">${this.success}</div>`:nothing}${this.showForm?this.renderForm():nothing}${this.selected?this.renderDetail():nothing}
     ${this.loading?html`<div class="state-loading">Loading transaction locks…</div>`:html`<div class="ledger-table-wrap"><table class="lock-table"><thead><tr><th>Lock</th><th>Scope</th><th>Period</th><th>Level</th><th>Status</th></tr></thead><tbody>${this.rows.length?this.rows.map(row=>html`<tr @click=${()=>this.selected=row}><td><strong>${row.lock_label}</strong><br><small>${row.lock_identifier || row.external_ref_id || "—"}</small></td><td>${row.module_scope}</td><td>${row.lock_from_date}<br><small>to ${row.lock_to_date || "open-ended"}</small></td><td><span class="level ${row.lock_level.toLowerCase()}">${row.lock_level}</span></td><td><span class="status ${row.status.toLowerCase()}">${row.status}</span></td></tr>`):html`<tr><td colspan="5" class="ledger-empty">No transaction locks found.</td></tr>`}</tbody></table></div>`}`; }
 }
 

@@ -16,9 +16,9 @@ Add Paprel embedded accounting widgets to my app.
 
 ## Reference
 
-- Configure pattern: `paprel-embed-ui-examples/apps/component-lab/main.ts` (search `configureAccounting`)
+- Configure pattern: `paprel-embed-ui-examples/apps/real-estate-accounting/src/session/session-manager.ts` (search `configureAccounting`)
 - BFF contract: `paprel-embed/docs/partner-integration/bff-contract.md`
-- Widget list: `paprel-embed-ui-examples/apps/component-lab/README.md#screens`
+- Widget composition: `paprel-embed-ui-examples/apps/real-estate-accounting/src/pages/pages.ts`
 
 ---
 

@@ -8,7 +8,7 @@ Install `@paprel/embed-core` for shared auth and transport plus the domain packa
 
 | I want to… | Read |
 |------------|------|
-| Run the widget smoke app locally | [Paprel Embed component lab](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab) |
+| Run the reference app locally | [Framework-neutral real-estate accounting app](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) |
 | **Public docs (paprel.com)** | [Build the embed token BFF](https://paprel.com/documentation/embedded-ui/build-bff) |
 | Understand why I need a BFF | [Build the embed token BFF](https://paprel.com/documentation/embedded-ui/build-bff) |
 | Implement the BFF (contract + security) | [`bff-contract.md`](bff-contract.md) |
@@ -47,9 +47,9 @@ The slice is versioned with the package so consumer tooling always matches the i
 
 | File | What it shows |
 |------|----------------|
-| [Dev token BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/shared/dev-token-bff.ts) | Dev BFF (token exchange) |
-| [Component lab frontend](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/component-lab/main.ts) | `configureAccounting` + widget shell |
-| [Component lab Vite config](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/component-lab/vite.config.ts) | Same-origin `/v1` proxy (dev only) |
+| [Dev token BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/real-estate-accounting/server/embed-token-bff.ts) | Dev BFF (token exchange) |
+| [Reference frontend](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/real-estate-accounting/src/app.ts) | Host routing + widget shell |
+| [Reference Vite config](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/real-estate-accounting/vite.config.ts) | Same-origin BFF middleware (dev only) |
 
 Production partners replace the Vite middleware with a real server route; the **contract stays the same**.
 
@@ -61,6 +61,6 @@ When Paprel shares OpenAPI + embed docs, a partner engineer (or AI agent) should
 2. Attach `openapi-embed-v1.json`, [`bff-contract.md`](bff-contract.md), and this guide
 3. Fill in **Partner stack** (framework, auth, widgets)
 4. Generate BFF route + `configureAccounting` page
-5. Verify against the [component lab](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab) behavior (token 200, widgets load, Bearer on `/v1/...`)
+5. Verify against the [reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) behavior (token 200, widgets load, Bearer on `/v1/...`)
 
 Stack-only prompts: [`bff-express.md`](../prompts/bff-express.md), [`bff-nextjs.md`](../prompts/bff-nextjs.md). Widget-only (BFF exists): [`wire-embed-widgets.md`](../prompts/wire-embed-widgets.md).
