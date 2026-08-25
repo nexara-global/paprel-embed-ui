@@ -9,6 +9,7 @@ import {
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import sharedStyles from "@paprel/ui/styles.css?inline";
+import { dispatchPaprelResourceOpen } from "@paprel/embed-core";
 
 @customElement("paprel-banking-list")
 export class PaprelBankingList extends LitElement {
@@ -88,6 +89,12 @@ export class PaprelBankingList extends LitElement {
   }
 
   private open(accountId: string): void {
+    const useDefault = dispatchPaprelResourceOpen(this, {
+      source: { component: this.localName },
+      resource: "bank-account",
+      id: accountId,
+    });
+    if (!useDefault) return;
     this.dispatchEvent(
       new CustomEvent("bank-account-select", {
         detail: { accountId },

@@ -4,6 +4,7 @@ import { formatJournalAmount, type JournalSummary } from "../headless.js";
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import sharedStyles from "@paprel/ui/styles.css?inline";
+import { dispatchPaprelResourceOpen, dispatchPaprelViewChange, type PaprelViewChangeReason } from "@paprel/embed-core";
 
 type JournalStatus = "posted" | "draft" | "voided" | "reversal";
 type JournalAction = "edit" | "copy" | "reverse" | "void" | "delete";
@@ -158,19 +159,21 @@ export class PaprelJournalList extends LitElement {
 
   @property({ type: Number, attribute: "page" }) page = 1;
   @property({ type: Number, attribute: "page-size" }) pageSize = 25;
+  @property({ type: Boolean, attribute: "manual-only" }) manualOnly = false;
+  @property({ type: String }) search = "";
+  @property({ type: String }) status = "";
   @state() private loading = true;
   @state() private error = "";
   @state() private rows: JournalSummary[] = [];
   @state() private totalRecords = 0;
-  @state() private manualView = false;
-  @state() private referenceFilter = "";
-  @state() private postedFilter = "";
+  @state() private searchDraft = "";
 
   private offLocaleChange?: () => void;
   private referenceDebounce?: ReturnType<typeof setTimeout>;
 
   async connectedCallback(): Promise<void> {
     super.connectedCallback();
+    this.searchDraft = this.search;
     this.offLocaleChange = onEmbedLocaleChange(() => this.requestUpdate());
     await this.load();
   }
@@ -182,7 +185,16 @@ export class PaprelJournalList extends LitElement {
   }
 
   async updated(changed: Map<string, unknown>): Promise<void> {
-    if (changed.has("page") || changed.has("pageSize")) await this.load();
+    if (
+      changed.has("page") ||
+      changed.has("pageSize") ||
+      changed.has("manualOnly") ||
+      changed.has("search") ||
+      changed.has("status")
+    ) {
+      if (changed.has("search")) this.searchDraft = this.search;
+      await this.load();
+    }
   }
 
   async refresh(): Promise<void> {
@@ -191,13 +203,13 @@ export class PaprelJournalList extends LitElement {
 
   private listParams() {
     const posted =
-      this.postedFilter === "posted" ? true : this.postedFilter === "draft" ? false : undefined;
+      this.status === "posted" ? true : this.status === "draft" ? false : undefined;
 
     return {
       page: this.page,
       pageSize: this.pageSize,
-      manual: this.manualView ? true : undefined,
-      reference: this.referenceFilter.trim() || undefined,
+      manual: this.manualOnly ? true : undefined,
+      reference: this.search.trim() || undefined,
       posted,
     };
   }
@@ -216,20 +228,45 @@ export class PaprelJournalList extends LitElement {
     }
   }
 
-  private async applyFilters(): Promise<void> {
+  private viewState() {
+    return {
+      page: this.page,
+      pageSize: this.pageSize,
+      manual: this.manualOnly,
+      search: this.search.trim(),
+      status: this.status,
+    } as const;
+  }
+
+  private emitViewChange(reason: PaprelViewChangeReason): void {
+    dispatchPaprelViewChange(this, {
+      source: { component: this.localName },
+      reason,
+      state: this.viewState(),
+    });
+  }
+
+  private applyFilters(reason: "filter" | "search"): void {
     this.page = 1;
-    await this.load();
+    this.emitViewChange(reason);
   }
 
   private onReferenceInput(event: Event): void {
-    this.referenceFilter = (event.target as HTMLInputElement).value;
+    this.searchDraft = (event.target as HTMLInputElement).value;
     if (this.referenceDebounce) clearTimeout(this.referenceDebounce);
     this.referenceDebounce = setTimeout(() => {
-      void this.applyFilters();
+      this.search = this.searchDraft;
+      this.applyFilters("search");
     }, 350);
   }
 
   private open(journalId: string): void {
+    const useDefault = dispatchPaprelResourceOpen(this, {
+      source: { component: this.localName },
+      resource: "journal",
+      id: journalId,
+    });
+    if (!useDefault) return;
     this.dispatchEvent(
       new CustomEvent("journal-select", {
         detail: { journalId },
@@ -255,11 +292,11 @@ export class PaprelJournalList extends LitElement {
     return Math.max(1, Math.ceil(this.totalRecords / this.pageSize));
   }
 
-  private async goToPage(next: number): Promise<void> {
+  private goToPage(next: number): void {
     const clamped = Math.min(Math.max(1, next), this.totalPages());
     if (clamped === this.page) return;
     this.page = clamped;
-    await this.load();
+    this.emitViewChange("page");
   }
 
   private formatDate(value?: string): string {
@@ -307,10 +344,10 @@ export class PaprelJournalList extends LitElement {
         <label class="field">
           <select
             aria-label="Journal source"
-            .value=${this.manualView ? "manual" : "all"}
+            .value=${this.manualOnly ? "manual" : "all"}
             @change=${(e: Event) => {
-              this.manualView = (e.target as HTMLSelectElement).value === "manual";
-              void this.applyFilters();
+              this.manualOnly = (e.target as HTMLSelectElement).value === "manual";
+              this.applyFilters("filter");
             }}
           >
             <option value="all">${i18n.t("allJournals")}</option>
@@ -320,10 +357,10 @@ export class PaprelJournalList extends LitElement {
         <label class="field">
           <select
             aria-label="Journal status"
-            .value=${this.postedFilter}
+            .value=${this.status}
             @change=${(e: Event) => {
-              this.postedFilter = (e.target as HTMLSelectElement).value;
-              void this.applyFilters();
+              this.status = (e.target as HTMLSelectElement).value;
+              this.applyFilters("filter");
             }}
           >
             <option value="">${i18n.t("filterAll")}</option>
@@ -335,7 +372,7 @@ export class PaprelJournalList extends LitElement {
           <input
             type="search"
             aria-label=${i18n.t("reference")}
-            .value=${this.referenceFilter}
+            .value=${this.searchDraft}
             placeholder=${i18n.t("reference")}
             @input=${this.onReferenceInput}
           />

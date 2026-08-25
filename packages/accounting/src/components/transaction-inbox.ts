@@ -8,6 +8,7 @@ import {
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import sharedStyles from "@paprel/ui/styles.css?inline";
+import { dispatchPaprelResourceOpen, dispatchPaprelViewChange, type PaprelViewChangeReason } from "@paprel/embed-core";
 
 const INBOX_VALUES: TransactionInbox[] = ["uncategorized", "categorized", "excluded"];
 
@@ -84,19 +85,21 @@ export class PaprelTransactionInbox extends LitElement {
   @property({ type: String }) inbox: TransactionInbox = "uncategorized";
   @property({ type: Number }) page = 1;
   @property({ type: Number, attribute: "page-size" }) pageSize = 25;
+  @property({ type: String }) search = "";
   @property({ type: String }) currency = "";
   @property({ type: Boolean, attribute: "show-inbox-tabs" }) showInboxTabs = true;
   @state() private loading = true;
   @state() private error = "";
   @state() private rows: BankingTransaction[] = [];
   @state() private totalRecords = 0;
-  @state() private descriptionFilter = "";
+  @state() private searchDraft = "";
 
   private offLocaleChange?: () => void;
   private referenceDebounce?: ReturnType<typeof setTimeout>;
 
   async connectedCallback(): Promise<void> {
     super.connectedCallback();
+    this.searchDraft = this.search;
     this.offLocaleChange = onEmbedLocaleChange(() => this.requestUpdate());
     await this.load();
   }
@@ -113,8 +116,10 @@ export class PaprelTransactionInbox extends LitElement {
       changed.has("inbox") ||
       changed.has("page") ||
       changed.has("pageSize") ||
+      changed.has("search") ||
       changed.has("currency")
     ) {
+      if (changed.has("search")) this.searchDraft = this.search;
       await this.load();
     }
   }
@@ -141,7 +146,7 @@ export class PaprelTransactionInbox extends LitElement {
         page: this.page,
         pageSize: this.pageSize,
         currency: this.currency || undefined,
-        description: this.descriptionFilter.trim() || undefined,
+        description: this.search.trim() || undefined,
       });
       this.rows = result.transactions;
       this.totalRecords = result.totalRecords ?? result.transactions.length;
@@ -159,17 +164,44 @@ export class PaprelTransactionInbox extends LitElement {
     return Math.max(1, Math.ceil(this.totalRecords / this.pageSize));
   }
 
+  private viewState() {
+    return {
+      page: this.page,
+      pageSize: this.pageSize,
+      search: this.search.trim(),
+      tab: this.inbox,
+    } as const;
+  }
+
+  private emitViewChange(reason: PaprelViewChangeReason): void {
+    dispatchPaprelViewChange(this, {
+      source: { component: this.localName },
+      reason,
+      state: this.viewState(),
+    });
+  }
+
   private goToPage(next: number): void {
-    this.page = Math.min(Math.max(1, next), this.totalPages());
+    const page = Math.min(Math.max(1, next), this.totalPages());
+    if (page === this.page) return;
+    this.page = page;
+    this.emitViewChange("page");
   }
 
   private setInbox(next: TransactionInbox): void {
     if (this.inbox === next) return;
     this.inbox = next;
     this.page = 1;
+    this.emitViewChange("tab");
   }
 
   private open(row: BankingTransaction): void {
+    const useDefault = dispatchPaprelResourceOpen(this, {
+      source: { component: this.localName },
+      resource: "transaction",
+      id: row.id,
+    });
+    if (!useDefault) return;
     this.dispatchEvent(
       new CustomEvent("transaction-select", {
         detail: { transactionId: row.id, transaction: row },
@@ -223,14 +255,15 @@ export class PaprelTransactionInbox extends LitElement {
           <label class="field">
             <input
               type="search"
-              .value=${this.descriptionFilter}
+              .value=${this.searchDraft}
               placeholder=${i18n.t("description")}
               @input=${(e: Event) => {
-                this.descriptionFilter = (e.target as HTMLInputElement).value;
+                this.searchDraft = (e.target as HTMLInputElement).value;
                 if (this.referenceDebounce) clearTimeout(this.referenceDebounce);
                 this.referenceDebounce = setTimeout(() => {
                   this.page = 1;
-                  void this.load();
+                  this.search = this.searchDraft;
+                  this.emitViewChange("search");
                 }, 300);
               }}
             />

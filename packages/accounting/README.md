@@ -2,6 +2,8 @@
 
 Embedded Paprel operational accounting — typed resources and Web Components for COA, journals, banking, transactions, and reconciliation. Financial report components ship together in `@paprel/reports`.
 
+The list components emit the shared `paprel:view-change` and `paprel:resource-open` events exported by `@paprel/embed-core`. The host can use one delegated listener to synchronize search, filters, tabs, and pagination with its router and to open resource pages. Paprel does not require or install a router.
+
 ## Install
 
 ```bash

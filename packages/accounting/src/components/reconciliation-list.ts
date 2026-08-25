@@ -4,6 +4,7 @@ import { formatJournalAmount, type ReconciliationRecord } from "../headless.js";
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import sharedStyles from "@paprel/ui/styles.css?inline";
+import { dispatchPaprelResourceOpen, dispatchPaprelViewChange } from "@paprel/embed-core";
 
 type StatusFilter = "all" | "draft" | "completed" | "voided";
 const STATUS_FILTERS: StatusFilter[] = ["all", "draft", "completed", "voided"];
@@ -133,6 +134,11 @@ export class PaprelReconciliationList extends LitElement {
     if (this.status === next) return;
     this.status = next;
     this.page = 1;
+    dispatchPaprelViewChange(this, {
+      source: { component: this.localName },
+      reason: "tab",
+      state: { page: this.page, pageSize: this.pageSize, status: this.status },
+    });
   }
 
   private totalPages(): number {
@@ -141,10 +147,23 @@ export class PaprelReconciliationList extends LitElement {
   }
 
   private goToPage(next: number): void {
-    this.page = Math.min(Math.max(1, next), this.totalPages());
+    const page = Math.min(Math.max(1, next), this.totalPages());
+    if (page === this.page) return;
+    this.page = page;
+    dispatchPaprelViewChange(this, {
+      source: { component: this.localName },
+      reason: "page",
+      state: { page: this.page, pageSize: this.pageSize, status: this.status },
+    });
   }
 
   private open(row: ReconciliationRecord): void {
+    const useDefault = dispatchPaprelResourceOpen(this, {
+      source: { component: this.localName },
+      resource: "reconciliation",
+      id: row.id,
+    });
+    if (!useDefault) return;
     this.dispatchEvent(
       new CustomEvent("reconciliation-select", {
         detail: { reconciliationId: row.id, reconciliation: row },
