@@ -116,7 +116,9 @@ The local beta bootstrap was the only interactive publish. All subsequent releas
 2. Run `npm run version:packages` on a release branch, review the generated versions and changelogs, and merge that pull request to `main`.
 3. **Actions → Release → Run workflow** on branch **`main`**. The workflow verifies and publishes the versions already committed to `main`.
 
-Every release after `0.1.0-beta.0` must consume its changesets through a reviewed version pull request before the release workflow is dispatched.
+During the beta line, use `npm run version:beta` on the release branch to increment all linked workspaces together (`beta.0` → `beta.1` → `beta.2`). The release workflow explicitly uses the npm `beta` dist-tag; remove that override only when preparing the first stable release.
+
+Every release after `0.1.0-beta.0` must land its generated versions through a reviewed version pull request before the release workflow is dispatched. Regular product changes continue to use Changesets for release intent and changelogs.
 
 Before publishing, run the framework-neutral [real-estate accounting reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) against staging using an ignored `.env.local` file.
 

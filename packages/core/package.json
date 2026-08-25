@@ -1,6 +1,6 @@
 {
   "name": "@paprel/embed-core",
-  "version": "0.1.0-beta.0",
+  "version": "0.1.0-beta.1",
   "description": "Shared Paprel embed authentication, HTTP transport, errors, and primitives",
   "type": "module",
   "main": "./dist/index.js",
