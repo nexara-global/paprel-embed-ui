@@ -2,4 +2,4 @@
 "@paprel/embed-accounting": patch
 ---
 
-Require explicit user confirmation before submitting a transaction match, including the selected document and amount in the confirmation prompt.
+Require localized user confirmation before submitting a transaction match, showing the exact amount and currency sent by the mutation payload, including FX and zero-document-amount fallbacks.

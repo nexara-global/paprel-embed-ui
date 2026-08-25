@@ -61,7 +61,7 @@ Adapt `requireSession` to my app. Never expose `client_secret`.
 
 ## Reference
 
-Full dev implementation: `paprel-embed-ui-examples/shared/dev-token-bff.ts`
+Full dev implementation: `paprel-embed-ui-examples/apps/real-estate-accounting/server/embed-token-bff.ts`
 
 ---
 

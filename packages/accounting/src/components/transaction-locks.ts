@@ -1,7 +1,7 @@
 import { css, html, LitElement, nothing, unsafeCSS } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import sharedStyles from "@paprel/embed-ui/styles.css?inline";
-import { getEmbedClient } from "../context.js";
+import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { PaprelApiError } from "../headless.js";
 import { todayIsoDate } from "../iso-date.js";
 import { hasUnmappedValidation, validationMessages, withoutValidationField } from "../lib/form-validation.js";
@@ -66,6 +66,7 @@ export class PaprelTransactionLocks extends LitElement {
 
   openCreate(): void {
     this.selected=null;
+    this.success="";
     this.showForm=true;
   }
 
@@ -80,6 +81,7 @@ export class PaprelTransactionLocks extends LitElement {
 
   private updateForm(field: keyof TransactionLockForm, event: Event): void {
     this.form={...this.form,[field]:(event.target as HTMLInputElement).value};
+    this.success="";
     this.fieldErrors=withoutValidationField(this.fieldErrors,field);
   }
 
@@ -90,7 +92,7 @@ export class PaprelTransactionLocks extends LitElement {
     event.preventDefault(); this.acting=true; this.error=""; this.success=""; this.fieldErrors={};
     try {
       const record=await getEmbedClient().transactionLocks.create({...this.form,lock_to_date:this.form.lock_to_date || null,external_ref_id:this.form.external_ref_id || null});
-      this.success="Transaction lock created successfully.";
+      this.success=getEmbedI18n().t("transactionLockCreatedSuccess");
       dispatchPaprelOperationSuccess(this,{source:{component:"paprel-transaction-locks"},action:"transaction-lock.created",message:this.success,resource:{type:"transaction-lock",id:record.id?String(record.id):undefined}});
       this.form=this.emptyForm(); this.showForm=false; await this.load();
     } catch(error) {

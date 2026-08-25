@@ -155,14 +155,16 @@ export class PaprelTransactionMatchSheet extends LitElement {
 
   private async confirm(match: TransactionMatch): Promise<void> {
     if (!this.transaction || this.confirming) return;
-    const label = this.matchLabel(match) || "the selected document";
-    const amount = this.matchAmount(match);
-    const accepted = window.confirm(`Confirm matching this transaction to ${label} (${amount})?`);
+    const i18n = getEmbedI18n();
+    const payload = buildConfirmMatchPayload(this.transaction, match);
+    const label = this.matchLabel(match) || i18n.t("selectedDocument");
+    const submittedAmount = Number(payload.mapping[0]?.amount ?? 0);
+    const amount = formatJournalAmount(submittedAmount, payload.currency);
+    const accepted = window.confirm(i18n.t("confirmMatchPrompt", { label, amount }));
     if (!accepted) return;
     this.confirming = true;
     this.actionError = "";
     try {
-      const payload = buildConfirmMatchPayload(this.transaction, match);
       await getEmbedClient().transactions.confirmMatch(payload);
       this.dispatchEvent(
         new CustomEvent("transaction-matched", {

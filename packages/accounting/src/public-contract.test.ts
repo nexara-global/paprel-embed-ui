@@ -50,6 +50,32 @@ describe("public accounting data contracts", () => {
     });
   });
 
+  it("uses the submitted FX amount and bank fallback for match confirmation", () => {
+    const transaction = { id: "txn-1", amount: "92.95", currency: "USD" } as BankingTransaction;
+    const fxPayload = buildConfirmMatchPayload(transaction, {
+      entity: "invoice", entity_id: "inv-fx", doc_amount: "100", doc_currency: "EUR", doc_exchange_rate: "1.10",
+    } as TransactionMatch);
+    assert.equal(fxPayload.mapping[0].amount, "110.00");
+    assert.equal(fxPayload.currency, "USD");
+
+    const fallbackPayload = buildConfirmMatchPayload(transaction, {
+      entity: "invoice", entity_id: "inv-zero", doc_amount: "0", doc_currency: "USD", doc_exchange_rate: "1",
+    } as TransactionMatch);
+    assert.equal(fallbackPayload.mapping[0].amount, "92.95");
+    assert.equal(fallbackPayload.mapping[0].original_amount, "92.95");
+  });
+
+  it("provides localized operation and confirmation messages", () => {
+    for (const locale of ["en", "ko", "es", "ru"] as const) {
+      const i18n = createEmbedI18n(locale);
+      assert.equal(i18n.t("confirmMatchPrompt", { label: "INV-1", amount: "110.00 USD" }).includes("{amount}"), false);
+      assert.ok(i18n.t("accountCreatedSuccess").length > 0);
+      assert.ok(i18n.t("journalUpdatedSuccess").length > 0);
+      assert.ok(i18n.t("reconciliationCreatedSuccess").length > 0);
+      assert.ok(i18n.t("transactionLockCreatedSuccess").length > 0);
+    }
+  });
+
   it("normalizes transaction and reconciliation envelopes defensively", () => {
     const transactions = normalizeTransactionListResponse({
       transactions: [{ id: 7, description: 99, matches: [{ transaction_id: 8, entity_id: 9 }] }],

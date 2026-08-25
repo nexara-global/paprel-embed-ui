@@ -20,7 +20,7 @@ Use `@paprel/embed-core` for shared auth and transport, then install complete do
 1. Receive App Connect credentials + OpenAPI embed slice (`@paprel/embed-accounting/openapi/openapi-embed-v1.json` after install, or [API documentation](https://paprel.com/api-documentation))
 2. Open [`prompts/build-embed-bff.md`](prompts/build-embed-bff.md) with your stack filled in
 3. Implement `/api/embed-token` per [`bff-contract.md`](partner-integration/bff-contract.md)
-4. Wire `configureAccounting` and mount widgets using the [component lab](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab) as reference
+4. Wire `configureAccounting` and mount widgets using the [framework-neutral reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting)
 5. Smoke against the standalone [Paprel Embed examples](https://github.com/nexara-global/paprel-embed-ui-examples)
 
 ## Monorepo layout

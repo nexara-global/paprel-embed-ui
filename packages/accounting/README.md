@@ -41,6 +41,17 @@ configureAccounting({
 
 The main import registers all accounting custom elements and includes their styles. No separate CSS or UI-package import is required.
 
+### Host-owned transaction lock action
+
+The transaction-lock list keeps creation in the host page header. Call the element's public `openCreate()` method from your CTA:
+
+```ts
+const locks = document.querySelector("paprel-transaction-locks");
+newLockButton.addEventListener("click", () => locks?.openCreate());
+```
+
+Successful mutations emit the shared `paprel:operation-success` event documented by `@paprel/embed-core`.
+
 ### Match your product theme
 
 Override inherited semantic variables on a wrapper:
@@ -69,6 +80,6 @@ The versioned accounting API slice ships at `@paprel/embed-accounting/openapi/op
 - [Build your BFF](https://paprel.com/documentation/embedded-ui/build-bff)
 - [20-minute integration guide](https://paprel.com/documentation/guides/build-embedded-accounting-20-minutes)
 - [BFF token contract](https://github.com/nexara-global/paprel-embed-ui/blob/main/docs/partner-integration/bff-contract.md)
-- [Sample app widget list](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab#screens)
+- [Framework-neutral sample application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting)
 
 Your backend must implement the embed token route — see the BFF contract link above.

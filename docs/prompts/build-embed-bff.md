@@ -19,10 +19,10 @@ Do not implement accounting business logic in the BFF. The BFF only exchanges `c
 ## Context documents (read these)
 
 - **BFF contract:** `paprel-embed/docs/partner-integration/bff-contract.md`
-- **Full guide:** `handbook/product/embed-partner-bff-guide.md`
+- **Integration hub:** `docs/partner-integration/README.md`
 - **OpenAPI embed v1:** `@paprel/embed-accounting/openapi/openapi-embed-v1.json` (App Connect + `/v1/accounting/*`, `/v1/reports/*`) — or [paprel.com API documentation](https://paprel.com/api-documentation)
-- **Reference BFF:** `paprel-embed-ui-examples/shared/dev-token-bff.ts`
-- **Reference frontend:** `paprel-embed-ui-examples/apps/component-lab/main.ts` (`configureAccounting` block)
+- **Reference BFF:** `paprel-embed-ui-examples/apps/real-estate-accounting/server/embed-token-bff.ts`
+- **Reference frontend:** `paprel-embed-ui-examples/apps/real-estate-accounting/src/session/session-manager.ts` (`configureAccounting` block)
 
 ---
 
@@ -134,7 +134,7 @@ Request scopes on the App Connect client in Paprel settings. Minimum for COA + j
 - `accounting:journal-list`
 - `accounting:journal-add`, `accounting:journal-edit` (for editor)
 
-Use the [component lab](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab) to verify banking, reports, and transaction workflows.
+Use the [framework-neutral reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) to verify banking, reports, and transaction workflows.
 
 ---
 

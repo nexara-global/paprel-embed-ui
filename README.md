@@ -27,7 +27,7 @@ Consumer examples now live in the dedicated [Paprel Embed examples repository](h
 
 ## Partner integration
 
-**Start here:** [`docs/partner-integration/README.md`](docs/partner-integration/README.md) — BFF contract, security model, and links to handbook.
+**Start here:** [`docs/partner-integration/README.md`](docs/partner-integration/README.md) — BFF contract, security model, and public integration references.
 
 | Goal | Doc |
 |------|-----|
@@ -67,7 +67,7 @@ configureAccounting({
 
 ## Web Components (v1)
 
-Layer A: COA, account picker/form, journals. Layer B: reports, banking, transactions, matching, reconciliations. See the [component lab screen list](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/component-lab#screens).
+Layer A: COA, account picker/form, journals. Layer B: reports, banking, transactions, matching, reconciliations. See the [framework-neutral reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting).
 
 Theme via inherited semantic CSS variables (`--paprel-color-primary`, …) from `@paprel/embed-ui`. No stylesheet import is required; override tokens on a wrapper or individual component.
 

@@ -194,12 +194,14 @@ export class PaprelJournalEditor extends LitElement {
       ...this.form,
       lines: [...this.form.lines, { account_id: "", debit: "", credit: "", description: "" }],
     };
+    this.success = "";
   }
 
   private removeLine(index: number): void {
     if (this.form.lines.length <= 2) return;
     const lines = this.form.lines.filter((_, i) => i !== index);
     this.form = { ...this.form, lines };
+    this.success = "";
   }
 
   private totals() {
@@ -229,7 +231,8 @@ export class PaprelJournalEditor extends LitElement {
       const result = this.effectiveMode() === "edit" && this.journalId
         ? await client.journals.update(this.journalId, payload)
         : await client.journals.create(payload);
-      this.success = this.effectiveMode() === "edit" ? "Journal updated successfully." : "Journal created successfully.";
+      const i18n = getEmbedI18n();
+      this.success = i18n.t(this.effectiveMode() === "edit" ? "journalUpdatedSuccess" : "journalCreatedSuccess");
       dispatchPaprelOperationSuccess(this, {
         source: { component: "paprel-journal-editor" },
         action: this.effectiveMode() === "edit" ? "journal.updated" : "journal.created",
@@ -285,6 +288,7 @@ export class PaprelJournalEditor extends LitElement {
           <label class="field">${i18n.t("date")}
             ${isoDateField(this.form.date, (value) => {
               this.form = { ...this.form, date: value };
+              this.success = "";
               this.clearFieldError("date");
             })}
             ${this.fieldFeedback("date")}
@@ -292,6 +296,7 @@ export class PaprelJournalEditor extends LitElement {
           <label class="field">${i18n.t("reference")}
             <input aria-invalid=${this.errorsFor("reference").length ? "true" : "false"} .value=${this.form.reference ?? ""} @input=${(e: Event) => {
               this.form = { ...this.form, reference: (e.target as HTMLInputElement).value };
+              this.success = "";
               this.clearFieldError("reference");
             }} />
             ${this.fieldFeedback("reference")}
@@ -299,6 +304,7 @@ export class PaprelJournalEditor extends LitElement {
           <label class="field">${i18n.t("currency")}
             <input aria-invalid=${this.errorsFor("currency").length ? "true" : "false"} .value=${this.form.currency} @input=${(e: Event) => {
               this.form = { ...this.form, currency: (e.target as HTMLInputElement).value };
+              this.success = "";
               this.clearFieldError("currency");
             }} />
             ${this.fieldFeedback("currency")}
@@ -307,6 +313,7 @@ export class PaprelJournalEditor extends LitElement {
             ? html`<label class="field">${i18n.t("exchangeRate")}
                 <input .value=${String(this.form.exchange_rate ?? "1")} @input=${(e: Event) => {
                   this.form = { ...this.form, exchange_rate: (e.target as HTMLInputElement).value };
+                  this.success = "";
                 }} />
               </label>`
             : null}
@@ -315,6 +322,7 @@ export class PaprelJournalEditor extends LitElement {
         <label class="field">${i18n.t("description")}
           <textarea aria-invalid=${this.errorsFor("description").length ? "true" : "false"} rows="2" .value=${this.form.description ?? ""} @input=${(e: Event) => {
             this.form = { ...this.form, description: (e.target as HTMLTextAreaElement).value };
+            this.success = "";
             this.clearFieldError("description");
           }}></textarea>
           ${this.fieldFeedback("description")}
@@ -327,6 +335,7 @@ export class PaprelJournalEditor extends LitElement {
                 .checked=${Boolean(this.form.posted)}
                 @change=${(e: Event) => {
                   this.form = { ...this.form, posted: (e.target as HTMLInputElement).checked };
+                  this.success = "";
                 }}
               />
               ${i18n.t("postOnSave")}

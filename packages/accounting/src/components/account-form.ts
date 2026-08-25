@@ -117,7 +117,8 @@ export class PaprelAccountForm extends LitElement {
         ? await client.accounts.update(this.accountId, this.form)
         : await client.accounts.create(this.form);
       client.refresh();
-      this.success = this.accountId ? "Account updated successfully." : "Account created successfully.";
+      const i18n = getEmbedI18n();
+      this.success = i18n.t(this.accountId ? "accountUpdatedSuccess" : "accountCreatedSuccess");
       dispatchPaprelOperationSuccess(this, {
         source: { component: "paprel-account-form" },
         action: this.accountId ? "account.updated" : "account.created",

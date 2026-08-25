@@ -3,15 +3,15 @@
   "info": {
     "title": "Paprel Embed API v1",
     "description": "Versioned subset of the Paprel public API used by @paprel/embed-accounting.",
-    "termsOfService": "https://newledger.io/terms",
+    "termsOfService": "https://paprel.com/terms",
     "contact": {
-      "name": "NewLedger Support",
-      "url": "https://newledger.io/contact",
-      "email": "support@newledger.io"
+      "name": "Paprel Support",
+      "url": "https://paprel.com/contact",
+      "email": "support@paprel.com"
     },
     "license": {
-      "name": "Proprietary",
-      "url": "https://newledger.io/license"
+      "name": "MIT",
+      "url": "https://opensource.org/license/mit"
     },
     "version": "1.1.0"
   },
@@ -2681,26 +2681,41 @@
           "App Connect"
         ],
         "summary": "OAuth Token Exchange",
+        "description": "Server-to-server client credentials exchange. Call this operation only from a partner BFF; never expose client_secret to browser code.",
         "operationId": "oauth_token_exchange",
         "parameters": [
           {
-            "name": "authorization",
+            "name": "x-partner-domain",
             "in": "header",
-            "description": "Format: Bearer <JWT_TOKEN>",
-            "required": true
-          },
-          {
-            "name": "x-data-signature",
-            "in": "header",
-            "description": "AES-encrypted signature for request validation",
-            "required": true
+            "description": "Partner application domain registered for the App Connect client.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TokenExchangeFormModel"
+                "type": "object",
+                "required": [
+                  "grant_type",
+                  "client_id",
+                  "client_secret"
+                ],
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "const": "client_credentials"
+                  },
+                  "client_id": {
+                    "type": "string"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  }
+                }
               }
             }
           },
@@ -2721,17 +2736,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized: JWT Bearer token missing or expired."
-          },
-          "412": {
-            "description": "Security check failed (Signature or JTI invalid)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SecurityErrorResponse"
-                }
-              }
-            }
+            "description": "App Connect client credentials are invalid or unauthorized."
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occurred on the server.",
@@ -2743,12 +2748,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/app-connect/oauth/token/validate": {

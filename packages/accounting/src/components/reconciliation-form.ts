@@ -64,7 +64,7 @@ export class PaprelReconciliationForm extends LitElement {
         opening_balance: this.openingBalance || undefined,
         closing_balance: this.closingBalance,
       });
-      this.success = "Reconciliation created successfully.";
+      this.success = getEmbedI18n().t("reconciliationCreatedSuccess");
       dispatchPaprelOperationSuccess(this, {
         source: { component: "paprel-reconciliation-form" },
         action: "reconciliation.created",
@@ -106,6 +106,7 @@ export class PaprelReconciliationForm extends LitElement {
           <label class="field">${i18n.t("dateFrom")}
             ${isoDateField(this.startDate, (value) => {
               this.startDate = value;
+              this.success = "";
               this.clearFieldError("start_date");
             }, { required: true })}
             ${this.fieldFeedback("start_date")}
@@ -113,6 +114,7 @@ export class PaprelReconciliationForm extends LitElement {
           <label class="field">${i18n.t("dateTo")}
             ${isoDateField(this.endDate, (value) => {
               this.endDate = value;
+              this.success = "";
               this.clearFieldError("end_date");
             }, { required: true })}
             ${this.fieldFeedback("end_date")}
@@ -120,6 +122,7 @@ export class PaprelReconciliationForm extends LitElement {
           <label class="field">${i18n.t("openingBalance")}
             <input aria-invalid=${this.errorsFor("opening_balance").length ? "true" : "false"} type="text" inputmode="decimal" .value=${this.openingBalance} @input=${(e: Event) => {
               this.openingBalance = (e.target as HTMLInputElement).value;
+              this.success = "";
               this.clearFieldError("opening_balance");
             }} />
             ${this.fieldFeedback("opening_balance")}
@@ -127,6 +130,7 @@ export class PaprelReconciliationForm extends LitElement {
           <label class="field">${i18n.t("closingBalance")}
             <input aria-invalid=${this.errorsFor("closing_balance").length ? "true" : "false"} type="text" inputmode="decimal" required .value=${this.closingBalance} @input=${(e: Event) => {
               this.closingBalance = (e.target as HTMLInputElement).value;
+              this.success = "";
               this.clearFieldError("closing_balance");
             }} />
             ${this.fieldFeedback("closing_balance")}
