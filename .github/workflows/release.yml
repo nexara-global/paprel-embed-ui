@@ -31,6 +31,10 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install npm with trusted publishing support
+        run: npm install --global npm@11.19.0
 
       - name: Verify npm CLI supports trusted publishing
         run: |
@@ -39,9 +43,9 @@ jobs:
             const { execSync } = require('node:child_process');
             const v = execSync('npm --version', { encoding: 'utf8' }).trim();
             const [maj, min, pat] = v.split('.').map(Number);
-            const ok = maj > 11 || (maj === 11 && min > 5) || (maj === 11 && min === 5 && pat >= 1);
+            const ok = maj > 11 || (maj === 11 && min >= 15);
             if (!ok) {
-              console.error('npm 11.5.1+ required for trusted publishing (OIDC)');
+              console.error('npm 11.15.0+ required for trusted publishing (OIDC)');
               process.exit(1);
             }
           "

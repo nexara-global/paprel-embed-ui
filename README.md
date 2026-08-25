@@ -81,33 +81,29 @@ Theme via inherited semantic CSS variables (`--paprel-color-primary`, …) from 
 
 ## Publishing to npm
 
-Packages are `@paprel/embed-core`, `@paprel/embed-ui`, `@paprel/embed-accounting`, and `@paprel/embed-reports` (public, version-linked via changesets). Publishing is **manual only** via [`.github/workflows/release.yml`](.github/workflows/release.yml) — dispatch from **`main`**.
+Packages are `@paprel/embed-core`, `@paprel/embed-ui`, `@paprel/embed-accounting`, and `@paprel/embed-reports` (public, version-linked via changesets). A maintainer starts releases manually from **`main`** through [`.github/workflows/release.yml`](.github/workflows/release.yml); npm authentication is automated with short-lived GitHub OIDC credentials.
 
 ### One-time npm setup
 
-1. Create the **`paprel`** org on [npmjs.com](https://www.npmjs.com/org/create) (claims the `@paprel` scope).
-2. **First publish** each package once from a maintainer machine (npm requires the package to exist before trusted publishing can be configured). The manifests enable provenance for CI, so explicitly disable it for this one local publication:
+The `@paprel` packages were bootstrapped interactively as `0.1.0-beta.0`. Configure their one-time trusted-publisher relationships from a maintainer machine using npm `11.15.0+`:
+
+1. Authenticate to npm with the maintainer account and passkey:
    ```bash
-   npm run lint && npm test && npm run pack:check && npm run consumer:check
-   npm publish --provenance=false -w @paprel/embed-core
-   npm publish --provenance=false -w @paprel/embed-ui
-   npm publish --provenance=false -w @paprel/embed-accounting
-   npm publish --provenance=false -w @paprel/embed-reports
-   git tag @paprel/embed-core@0.1.0
-   git tag @paprel/embed-ui@0.1.0
-   git tag @paprel/embed-accounting@0.1.0
-   git tag @paprel/embed-reports@0.1.0
-   git push origin --tags
+   npm login --scope=@paprel --registry=https://registry.npmjs.org --auth-type=web
    ```
-3. On npm, configure trusted publishing for all four packages, including `@paprel/embed-reports`.
-   - Organization / user: `nexara-global`
-   - Repository: `paprel-embed-ui`
-   - Workflow filename: `release.yml` (exact match, including extension)
-4. (Recommended) **Settings → Publishing access → Require 2FA and disallow tokens** — OIDC publishes still work; long-lived write tokens are blocked.
+2. Configure the exact repository and workflow for every package:
+   ```bash
+   npm trust github @paprel/embed-core --repo nexara-global/paprel-embed-ui --file release.yml --allow-publish
+   npm trust github @paprel/embed-ui --repo nexara-global/paprel-embed-ui --file release.yml --allow-publish
+   npm trust github @paprel/embed-accounting --repo nexara-global/paprel-embed-ui --file release.yml --allow-publish
+   npm trust github @paprel/embed-reports --repo nexara-global/paprel-embed-ui --file release.yml --allow-publish
+   ```
+3. Verify all four relationships with `npm trust list <package>`.
+4. In each package's npm settings, select **Require 2FA and disallow tokens**. Trusted publishing continues to work while long-lived write tokens are blocked.
 
-Do **not** add an `NPM_TOKEN` secret for publishing. The workflow uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC). Requires npm CLI 11.5.1+ (bundled with Node 24 on GitHub runners).
+Do **not** add an `NPM_TOKEN` secret for publishing. The workflow uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC), pins an npm CLI version that supports it, and grants only the required GitHub `id-token: write` permission.
 
-The local first publish is the only exception: it uses your interactive npm maintainer session and `--provenance=false`. All subsequent releases should use the GitHub workflow so npm can attach provenance.
+The local beta bootstrap was the only interactive publish. All subsequent releases use the GitHub workflow, and npm automatically attaches provenance for this public repository and its public packages.
 
 `package.json` `repository.url` must match `https://github.com/nexara-global/paprel-embed-ui` for OIDC validation.
 
@@ -120,9 +116,9 @@ The local first publish is the only exception: it uses your interactive npm main
 2. Run `npm run version:packages` on a release branch, review the generated versions and changelogs, and merge that pull request to `main`.
 3. **Actions → Release → Run workflow** on branch **`main`**. The workflow verifies and publishes the versions already committed to `main`.
 
-The initial `0.1.0` release can be published directly after this repository is created because those versions are already committed. Subsequent releases should consume their changesets through a version pull request first.
+Every release after `0.1.0-beta.0` must consume its changesets through a reviewed version pull request before the release workflow is dispatched.
 
-Before the first publish, run the framework-neutral [real-estate accounting reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) against staging using an ignored `.env.local` file.
+Before publishing, run the framework-neutral [real-estate accounting reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) against staging using an ignored `.env.local` file.
 
 ## Community and license
 
