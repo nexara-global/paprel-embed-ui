@@ -184,6 +184,12 @@ export const EMBED_LOCALE_MESSAGES = {
       "accountUpdatedSuccess": "Account updated successfully.",
       "journalCreatedSuccess": "Journal created successfully.",
       "journalUpdatedSuccess": "Journal updated successfully.",
+      "versionHistory": "Version history",
+      "currentVersion": "Current version",
+      "snapshotVersion": "Snapshot version",
+      "compareJournals": "Journal comparison",
+      "closeComparison": "Close comparison",
+      "archivedVersion": "Archived",
       "reconciliationCreatedSuccess": "Reconciliation created successfully.",
       "transactionLockCreatedSuccess": "Transaction lock created successfully."
     }
@@ -372,6 +378,12 @@ export const EMBED_LOCALE_MESSAGES = {
       "accountUpdatedSuccess": "계정이 업데이트되었습니다.",
       "journalCreatedSuccess": "분개가 생성되었습니다.",
       "journalUpdatedSuccess": "분개가 업데이트되었습니다.",
+      "versionHistory": "버전 기록",
+      "currentVersion": "현재 버전",
+      "snapshotVersion": "스냅샷 버전",
+      "compareJournals": "분개 비교",
+      "closeComparison": "비교 닫기",
+      "archivedVersion": "보관됨",
       "reconciliationCreatedSuccess": "조정이 생성되었습니다.",
       "transactionLockCreatedSuccess": "거래 잠금이 생성되었습니다."
     }
@@ -560,6 +572,12 @@ export const EMBED_LOCALE_MESSAGES = {
       "accountUpdatedSuccess": "Cuenta actualizada correctamente.",
       "journalCreatedSuccess": "Diario creado correctamente.",
       "journalUpdatedSuccess": "Diario actualizado correctamente.",
+      "versionHistory": "Historial de versiones",
+      "currentVersion": "Versión actual",
+      "snapshotVersion": "Versión de instantánea",
+      "compareJournals": "Comparación de diarios",
+      "closeComparison": "Cerrar comparación",
+      "archivedVersion": "Archivada",
       "reconciliationCreatedSuccess": "Conciliación creada correctamente.",
       "transactionLockCreatedSuccess": "Bloqueo de transacciones creado correctamente."
     }
@@ -748,6 +766,12 @@ export const EMBED_LOCALE_MESSAGES = {
       "accountUpdatedSuccess": "Счёт успешно обновлён.",
       "journalCreatedSuccess": "Проводка успешно создана.",
       "journalUpdatedSuccess": "Проводка успешно обновлена.",
+      "versionHistory": "История версий",
+      "currentVersion": "Текущая версия",
+      "snapshotVersion": "Снимок версии",
+      "compareJournals": "Сравнение проводок",
+      "closeComparison": "Закрыть сравнение",
+      "archivedVersion": "Архивная",
       "reconciliationCreatedSuccess": "Сверка успешно создана.",
       "transactionLockCreatedSuccess": "Блокировка транзакций успешно создана."
     }

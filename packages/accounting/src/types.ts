@@ -59,8 +59,19 @@ export type JournalForm = {
   [key: string]: unknown;
 };
 
+export type JournalVersionHistoryItem = {
+  id: string;
+  version_number: number;
+  is_current: boolean;
+  created_at?: string;
+  transaction_hash?: string | null;
+};
+
 export type JournalSummary = {
   id: string;
+  /** Stable identity across restatements. List/detail links should use this. */
+  anchor_id?: string;
+  is_current?: boolean;
   /** Operator-visible journal number (e.g. JRN-00042). */
   identifier?: string | null;
   date?: string;
@@ -97,6 +108,7 @@ export type JournalListResult = {
 export type JournalDetail = JournalSummary & {
   lines?: JournalLine[];
   version_number?: number;
+  version_history?: JournalVersionHistoryItem[];
 };
 
 export type Paginated<T> = {
