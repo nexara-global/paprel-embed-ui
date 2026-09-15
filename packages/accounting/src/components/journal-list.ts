@@ -1,6 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { formatJournalAmount, type JournalSummary } from "../headless.js";
+import { formatJournalAmount, journalAnchorId, type JournalSummary } from "../headless.js";
 import { getEmbedClient, getEmbedI18n } from "../context.js";
 import { onEmbedLocaleChange } from "../locale-listener.js";
 import sharedStyles from "@paprel/embed-ui/styles.css?inline";
@@ -425,8 +425,8 @@ export class PaprelJournalList extends LitElement {
                 <tr
                   class=${row.is_voided ? "is-voided" : ""}
                   tabindex="0"
-                  @click=${() => this.open(row.id)}
-                  @keydown=${(event: KeyboardEvent) => { if (event.key === "Enter" || event.key === " ") this.open(row.id); }}
+                  @click=${() => this.open(journalAnchorId(row))}
+                  @keydown=${(event: KeyboardEvent) => { if (event.key === "Enter" || event.key === " ") this.open(journalAnchorId(row)); }}
                 >
                   <td class="col-date">${this.formatDate(row.date)}</td>
                   <td class="col-id">${row.identifier ?? ""}</td>

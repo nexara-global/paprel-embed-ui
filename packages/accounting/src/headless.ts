@@ -11,6 +11,7 @@ export { createEmbedI18n, accountI18nKey, EMBED_LOCALES, type EmbedI18n, type Em
 export { createAccountsResource, type AccountsResource } from "./resources/accounts.js";
 export {
   createJournalsResource,
+  journalAnchorId,
   normalizeJournalListResponse,
   normalizeJournalMutationResponse,
   type JournalsResource,
