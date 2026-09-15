@@ -1,6 +1,6 @@
 {
   "name": "@paprel/embed-reports",
-  "version": "0.1.0-beta.0",
+  "version": "0.1.0-beta.1",
   "description": "Complete Paprel financial reports client and embeddable Web Components",
   "type": "module",
   "main": "./dist/index.js",
