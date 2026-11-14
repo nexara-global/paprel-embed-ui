@@ -49,6 +49,10 @@
     {
       "name": "Financial Reports",
       "description": "Generate tenant financial statements and ledger reports from the same posted accounting records used by hosted and embedded reporting experiences."
+    },
+    {
+      "name": "Accounting / Dimensions",
+      "description": "Generally available accounting dimensions: manage tenant-owned definitions and values, classify transaction lines, report by dimension, and correct missing assignments. Dimensions remain optional; deployment availability and existing permissions apply."
     }
   ],
   "paths": {
@@ -824,6 +828,2288 @@
         }
       }
     },
+    "/v1/accounting/dimensions": {
+      "get": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "List accounting dimensions",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-list, accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "list_get_accounting_dimensions",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "`active` (default), `archived` or `all`.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DimensionStatus"
+            }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "description": "Only dimensions enabled for this scope.",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/components/schemas/DimensionScope"
+                }
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Case-insensitive prefix match on the name or code.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque `next_cursor` from the previous page. Omit for the first page; keep every other filter unchanged between pages.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Dimensions per page, 1 to 100. Omitted means 25; other values are rejected.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Use values to include each dimension's values in the same response. Status applies to both definitions and nested values. More than 5,000 nested values returns DIMENSION_INCLUDE_LIMIT_EXCEEDED; use the paginated values endpoint instead.",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/components/schemas/DimensionInclude"
+                }
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Page_Dimension"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 60 requests per minute per client (bursts up to 75). The response has no body and no `Retry-After` header; wait 1 second before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-list",
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      },
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Create an accounting dimension",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "create_post_accounting_dimensions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDimensionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Dimension"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/initialize": {
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Initialize default accounting dimensions",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "initialize",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_InitializeDimensionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/worklist": {
+      "get": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "List posted records with missing dimensions",
+        "description": "Posted records that have taggable revenue/expense lines without a value for at least one dimension, newest first, one row per record. module is documents (with doc_type invoice, bill or credit-note), expenses or journals (manual journals). Cursor-paged. The API Gateway checks the income-statement report permission (or role:admin). The backend additionally enforces the requested owner's list permission: invoice:list, bill:list, credit-note:list, expense:list, or accounting:journal-list. The x-api-gateway-auth metadata describes gateway checks only.\n\nThe API Gateway requires a bearer access token. Required permissions (any): report:income-statement, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "list_get_accounting_dimensions_worklist",
+        "parameters": [
+          {
+            "name": "module",
+            "in": "query",
+            "description": "`documents`, `expenses` or `journals`.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "doc_type",
+            "in": "query",
+            "description": "`invoice`, `bill` or `credit-note`; required for `documents`, rejected otherwise.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "date_range",
+            "in": "query",
+            "description": "Required, `YYYY-MM-DD,YYYY-MM-DD`, inclusive, at most 366 days.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dimension_ids",
+            "in": "query",
+            "description": "Comma-separated dimension ids; absent means every active dimension enabled for transactions.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque `next_cursor` from the previous page. Omit for the first page; keep every other filter unchanged between pages.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Records per page, 1 to 100. Omitted means 25; other values are rejected.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Page_DimensionWorklistItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dimension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 60 requests per minute per client (bursts up to 75). The response has no body and no `Retry-After` header; wait 1 second before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "report:income-statement",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/worklist/summary": {
+      "get": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Summarize posted records with missing dimensions",
+        "description": "How many records need a value, in total, per record type and per dimension, by the same rule as the worklist. Requires the income-statement report permission.\n\nThe API Gateway requires a bearer access token. Required permissions (any): report:income-statement, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "summary_get_accounting_dimensions_worklist_summary",
+        "parameters": [
+          {
+            "name": "date_range",
+            "in": "query",
+            "description": "Required, `YYYY-MM-DD,YYYY-MM-DD`, inclusive, at most 366 days.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dimension_ids",
+            "in": "query",
+            "description": "Comma-separated dimension identifiers. Omitted means every active dimension enabled for transactions.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionWorklistSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dimension not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 12 requests per minute per client (bursts up to 15). The response has no body and no `Retry-After` header; wait 5 seconds before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "report:income-statement",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}": {
+      "get": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Get an accounting dimension",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-list, accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "get_get_accounting_dimensions_dimension_id",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Dimension"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 60 requests per minute per client (bursts up to 75). The response has no body and no `Retry-After` header; wait 1 second before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-list",
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      },
+      "patch": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Update an accounting dimension",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "update_patch_accounting_dimensions_dimension_id",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDimensionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Dimension"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/account-lines": {
+      "get": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "List account lines by dimension value",
+        "description": "Cursor-paged lines of one account (newest first) with their current value for the dimension. value_id filters to a value (descendants included) or `unassigned`. Entry point for the account-detail list. Requires the general-ledger report permission.\n\nThe API Gateway requires a bearer access token. Required permissions (any): report:general-ledger, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "account_lines",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "account_id",
+            "in": "query",
+            "description": "Account identifier (`id` from the chart of accounts).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date_range",
+            "in": "query",
+            "description": "Required, `YYYY-MM-DD,YYYY-MM-DD`, inclusive, at most 366 days.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "value_id",
+            "in": "query",
+            "description": "A value id (its descendants are included) or `unassigned`; omit for every line.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque `next_cursor` from the previous page. Omit for the first page; keep every other filter unchanged between pages.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Lines per page, 1 to 100. Omitted means 25; other values are rejected.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Page_DimensionAccountLine"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dimension, account or value not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 60 requests per minute per client (bursts up to 75). The response has no body and no `Retry-After` header; wait 1 second before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "report:general-ledger",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/archive": {
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Archive an accounting dimension",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "archive_post_accounting_dimensions_dimension_id_archive",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Dimension"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/income-statement": {
+      "get": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Get income statement by dimension value",
+        "description": "Income statement grouped by one dimension: direct and inclusive (descendant) amounts per value plus a computed Unassigned bucket whose total reconciles to the unfiltered statement. With value_id (a value id or `unassigned`) it drills into that selection's accounts. Requires the income-statement report permission.\n\nThe API Gateway requires a bearer access token. Required permissions (any): report:income-statement, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "income_statement",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date_range",
+            "in": "query",
+            "description": "Required, `YYYY-MM-DD,YYYY-MM-DD`, inclusive, at most 366 days.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "value_id",
+            "in": "query",
+            "description": "Drill-down: a value id (its descendants are included) or `unassigned`.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionIncomeStatement"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dimension or value not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 12 requests per minute per client (bursts up to 15). The response has no body and no `Retry-After` header; wait 5 seconds before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "report:income-statement",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/restore-label": {
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Restore a dimension default label",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "restore_label",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Dimension"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/unarchive": {
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Unarchive an accounting dimension",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "unarchive",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Dimension"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/values": {
+      "get": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "List dimension values",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-list, accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "list_values",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "`active` (default), `archived` or `all`.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DimensionStatus"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Case-insensitive prefix match on the name or code.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque `next_cursor` from the previous page. Omit for the first page; keep every other filter unchanged between pages.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Values per page, 1 to 100. Omitted means 25; other values are rejected.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "parent_value_id",
+            "in": "query",
+            "description": "Only values directly under this parent value.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "assignable",
+            "in": "query",
+            "description": "`true` returns only values that can be set on a line (leaf values that are not archived).",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Page_DimensionValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 60 requests per minute per client (bursts up to 75). The response has no body and no `Retry-After` header; wait 1 second before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-list",
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      },
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Create a dimension value",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "create_value",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDimensionValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/values/{value_id}": {
+      "get": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Get a dimension value",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-list, accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "get_value",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "value_id",
+            "in": "path",
+            "description": "Dimension value identifier (`id` from the dimension's values list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 60 requests per minute per client (bursts up to 75). The response has no body and no `Retry-After` header; wait 1 second before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-list",
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      },
+      "patch": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Update a dimension value",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "update_value",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "value_id",
+            "in": "path",
+            "description": "Dimension value identifier (`id` from the dimension's values list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDimensionValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/values/{value_id}/archive": {
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Archive a dimension value",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "archive_value",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "value_id",
+            "in": "path",
+            "description": "Dimension value identifier (`id` from the dimension's values list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/values/{value_id}/restore-label": {
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Restore a dimension value default label",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "restore_label_value",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "value_id",
+            "in": "path",
+            "description": "Dimension value identifier (`id` from the dimension's values list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/dimensions/{dimension_id}/values/{value_id}/unarchive": {
+      "post": {
+        "tags": [
+          "Accounting / Dimensions"
+        ],
+        "summary": "Unarchive a dimension value",
+        "description": "Tenant-scoped Dimensions operation. Requires dimension management permission for writes; list or management permission for reads.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:dimension-manage, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "unarchive_value",
+        "parameters": [
+          {
+            "name": "dimension_id",
+            "in": "path",
+            "description": "Dimension identifier (`id` from the dimensions list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "value_id",
+            "in": "path",
+            "description": "Dimension value identifier (`id` from the dimension's values list).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "403": {
+            "description": "Permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:dimension-manage",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
     "/v1/accounting/journals": {
       "get": {
         "tags": [
@@ -1586,6 +3872,118 @@
           "bearer": true,
           "scopes": [
             "accounting:journal-delete",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/journals/{anchor_id}/dimensions": {
+      "put": {
+        "tags": [
+          "Accounting / Journals"
+        ],
+        "summary": "Correct Journal line dimensions",
+        "description": "Changes the dimension values of a posted manual journal's lines and nothing else (amounts, accounts and dates cannot be sent). Each listed line gets exactly the values sent (an empty list clears it); lines not listed keep theirs. The journal is restated: the current version is frozen and a new version is minted on the same anchor with identical lines and the new resolved values, so line ids change. Send expected_version (the current version_number). Refused for voided, reconciled and system-generated journals. Transaction Locking applies as for an edit: a hard lock refuses the call, a soft lock lets a user with the bypass permission through and is logged.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:journal-edit, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "correct_dimensions_put_accounting_journals_anchor_id_dimensions",
+        "parameters": [
+          {
+            "name": "anchor_id",
+            "in": "path",
+            "description": "Stable journal anchor_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DimensionCorrectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Corrected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_DimensionCorrectionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or lock error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "404": {
+            "description": "Journal not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version conflict, unknown line, or journal not correctable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserErrorModel"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded: this operation allows 6 requests per minute per client (bursts up to 8). The response has no body and no `Retry-After` header; wait 10 seconds before retrying."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:journal-edit",
             "role:admin"
           ],
           "scopes_matcher": "any"
@@ -2935,6 +5333,96 @@
           "scopes": [
             "accounting:banking-transaction-add",
             "accounting:banking-transaction-edit",
+            "role:admin"
+          ],
+          "scopes_matcher": "any"
+        }
+      }
+    },
+    "/v1/accounting/transactions/settlement-preview": {
+      "post": {
+        "tags": [
+          "Accounting / Transactions"
+        ],
+        "summary": "Preview Bank Settlement",
+        "description": "Returns estimated FX conversion, explicit bank/document allocations, fees, remaining balances and projected realised FX. Estimates do not establish settlement: confirm-match accepts the returned explicit amounts and revalidates current balances.\n\nThe API Gateway requires a bearer access token. Required permissions (any): accounting:banking-transaction-add, accounting:banking-transaction-edit, accounting:banking-transaction-category, accounting:banking-transaction-reconcile, role:admin. Audience and session binding checks also apply. A browser session route is not automatically available to partner credentials.",
+        "operationId": "settlement_preview",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PartnerDomain"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettlementPreviewForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementPreviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed for one or more fields, or a business rule rejected the request. Field validation returns `{\"error\": {field: [codes]}}`; other rejections return `{\"error\": {code, message, details?}}`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: JWT Bearer token missing or expired."
+          },
+          "500": {
+            "description": "Internal Server Error: An unexpected error occurred on the server. The body is either the JSON string `INTERNAL_SERVER_ERROR` or the standard `{\"error\": {code, message}}` envelope, depending on the route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InternalServerErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserErrorModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-api-gateway-auth": {
+          "bearer": true,
+          "scopes": [
+            "accounting:banking-transaction-add",
+            "accounting:banking-transaction-edit",
+            "accounting:banking-transaction-category",
+            "accounting:banking-transaction-reconcile",
             "role:admin"
           ],
           "scopes_matcher": "any"
@@ -6590,6 +9078,878 @@
           }
         }
       },
+      "CreateDimensionRequest": {
+        "type": "object",
+        "description": "Creates a tenant-owned accounting dimension definition with its scope and label.",
+        "required": [
+          "code",
+          "name",
+          "scopes"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DimensionScope"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDimensionValueRequest": {
+        "type": "object",
+        "description": "Creates a value within an accounting dimension, optionally beneath a parent value.",
+        "required": [
+          "code",
+          "name"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_group": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "parent_value_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "CursorPagination": {
+        "type": "object",
+        "description": "Continuation metadata for a bounded list. Use `next_cursor` unchanged when requesting the next page.",
+        "required": [
+          "has_more"
+        ],
+        "properties": {
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "DataResponse_Dimension": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "id",
+              "code",
+              "name",
+              "scopes",
+              "is_archived",
+              "can_restore_default_label",
+              "value_counts"
+            ],
+            "properties": {
+              "can_restore_default_label": {
+                "type": "boolean"
+              },
+              "code": {
+                "type": "string"
+              },
+              "default_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "is_archived": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string"
+              },
+              "scopes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DimensionScope"
+                }
+              },
+              "template_key": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value_counts": {
+                "$ref": "#/components/schemas/ValueCounts"
+              },
+              "values": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "$ref": "#/components/schemas/DimensionValue"
+                },
+                "description": "Present only when the list was asked for `include=values`: every value of this dimension that\nmatches the requested status, in the same order and with the same shape as the values list."
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_DimensionCorrectionResponse": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "record_id",
+              "lines_changed",
+              "items"
+            ],
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DimensionCorrectionItem"
+                },
+                "description": "Every line of the record with its resulting values."
+              },
+              "lines_changed": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Lines whose set of values changed; 0 means nothing was written.",
+                "minimum": 0
+              },
+              "record_id": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "version_number": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_DimensionIncomeStatement": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "dimension_id",
+              "dimension_name",
+              "date_from",
+              "date_to",
+              "buckets",
+              "accounts"
+            ],
+            "properties": {
+              "accounts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DimensionIncomeAccount"
+                }
+              },
+              "buckets": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DimensionIncomeBucket"
+                },
+                "description": "Grouped mode: values with activity, ordered by code. Empty in drill-down mode."
+              },
+              "date_from": {
+                "type": "string"
+              },
+              "date_to": {
+                "type": "string"
+              },
+              "dimension_id": {
+                "type": "string"
+              },
+              "dimension_name": {
+                "type": "string"
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DimensionAmounts",
+                    "description": "Drill-down mode: the selection's amounts and its accounts, ordered by account name."
+                  }
+                ]
+              },
+              "totals": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DimensionAmounts",
+                    "description": "Grouped mode: direct buckets plus Unassigned. Equals the unfiltered income statement."
+                  }
+                ]
+              },
+              "unassigned": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DimensionAmounts",
+                    "description": "Grouped mode: lines with no value for the dimension."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_DimensionValue": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "id",
+              "dimension_id",
+              "code",
+              "name",
+              "path",
+              "is_group",
+              "is_archived",
+              "can_restore_default_label"
+            ],
+            "properties": {
+              "can_restore_default_label": {
+                "type": "boolean"
+              },
+              "code": {
+                "type": "string"
+              },
+              "default_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "dimension_id": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "is_archived": {
+                "type": "boolean"
+              },
+              "is_group": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string"
+              },
+              "parent": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ValuePathEntry"
+                  }
+                ]
+              },
+              "parent_value_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ValuePathEntry"
+                }
+              },
+              "template_key": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_DimensionWorklistSummary": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "records",
+              "by_type",
+              "by_dimension"
+            ],
+            "properties": {
+              "by_dimension": {
+                "type": "object",
+                "description": "Records with at least one line missing a value, per dimension id.",
+                "additionalProperties": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0
+                },
+                "propertyNames": {
+                  "type": "string"
+                }
+              },
+              "by_type": {
+                "type": "object",
+                "description": "Records needing a value per record type (`invoice`, `bill`, `credit-note`, `expense`, `journal`).",
+                "additionalProperties": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0
+                },
+                "propertyNames": {
+                  "type": "string"
+                }
+              },
+              "records": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Records needing a value, across every record type.",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_InitializeDimensionsResponse": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "initialized",
+              "created"
+            ],
+            "properties": {
+              "created": {
+                "type": "boolean"
+              },
+              "initialized": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_Page_Dimension": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "A bounded collection of items and cursor pagination metadata. Pass the next cursor unchanged to continue.",
+            "required": [
+              "items",
+              "pagination"
+            ],
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "code",
+                    "name",
+                    "scopes",
+                    "is_archived",
+                    "can_restore_default_label",
+                    "value_counts"
+                  ],
+                  "properties": {
+                    "can_restore_default_label": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "default_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "is_archived": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "scopes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/DimensionScope"
+                      }
+                    },
+                    "template_key": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "value_counts": {
+                      "$ref": "#/components/schemas/ValueCounts"
+                    },
+                    "values": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "$ref": "#/components/schemas/DimensionValue"
+                      },
+                      "description": "Present only when the list was asked for `include=values`: every value of this dimension that\nmatches the requested status, in the same order and with the same shape as the values list."
+                    }
+                  }
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/CursorPagination"
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_Page_DimensionAccountLine": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "A bounded collection of items and cursor pagination metadata. Pass the next cursor unchanged to continue.",
+            "required": [
+              "items",
+              "pagination"
+            ],
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "line_id",
+                    "journal_id",
+                    "journal_anchor_id",
+                    "journal_version_number",
+                    "identifier",
+                    "date",
+                    "entry_type",
+                    "amount"
+                  ],
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Company base currency, always positive; see `entry_type`."
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "entry_type": {
+                      "type": "string",
+                      "description": "`debit` or `credit`."
+                    },
+                    "identifier": {
+                      "type": "string"
+                    },
+                    "journal_anchor_id": {
+                      "type": "string"
+                    },
+                    "journal_id": {
+                      "type": "string"
+                    },
+                    "journal_version_number": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "line_id": {
+                      "type": "string"
+                    },
+                    "source_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Owning source (`invoice`, `bill`, `expense`, ...) when the journal is system posted."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DimensionLineValue",
+                          "description": "Absent when the line has no value for the dimension."
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/CursorPagination"
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_Page_DimensionValue": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "A bounded collection of items and cursor pagination metadata. Pass the next cursor unchanged to continue.",
+            "required": [
+              "items",
+              "pagination"
+            ],
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "dimension_id",
+                    "code",
+                    "name",
+                    "path",
+                    "is_group",
+                    "is_archived",
+                    "can_restore_default_label"
+                  ],
+                  "properties": {
+                    "can_restore_default_label": {
+                      "type": "boolean"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "default_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "dimension_id": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "is_archived": {
+                      "type": "boolean"
+                    },
+                    "is_group": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "parent": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "$ref": "#/components/schemas/ValuePathEntry"
+                        }
+                      ]
+                    },
+                    "parent_value_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "path": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ValuePathEntry"
+                      }
+                    },
+                    "template_key": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/CursorPagination"
+              }
+            }
+          }
+        }
+      },
+      "DataResponse_Page_DimensionWorklistItem": {
+        "type": "object",
+        "description": "Successful response envelope containing the operation result under `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "A bounded collection of items and cursor pagination metadata. Pass the next cursor unchanged to continue.",
+            "required": [
+              "items",
+              "pagination"
+            ],
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "record_id",
+                    "module",
+                    "record_type",
+                    "number",
+                    "date",
+                    "status",
+                    "lines_missing",
+                    "lines_total",
+                    "missing_by_dimension",
+                    "editable"
+                  ],
+                  "properties": {
+                    "amount": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "blocked_reason": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Why `editable` is false (for example `reconciled`)."
+                    },
+                    "currency": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "editable": {
+                      "type": "boolean"
+                    },
+                    "lines_missing": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Taggable revenue/expense lines still missing a value for at least one requested dimension.",
+                      "minimum": 0
+                    },
+                    "lines_total": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "All taggable revenue/expense lines of the record.",
+                      "minimum": 0
+                    },
+                    "lock": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DimensionWorklistLock"
+                        }
+                      ]
+                    },
+                    "missing_by_dimension": {
+                      "type": "object",
+                      "description": "Lines missing a value, per requested dimension id.",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0
+                      },
+                      "propertyNames": {
+                        "type": "string"
+                      }
+                    },
+                    "module": {
+                      "type": "string"
+                    },
+                    "number": {
+                      "type": "string"
+                    },
+                    "party_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "The contact, or the expense note / journal description where there is none."
+                    },
+                    "record_id": {
+                      "type": "string",
+                      "description": "Document `anchor_id`, expense id, or manual journal `anchor_id`."
+                    },
+                    "record_type": {
+                      "type": "string",
+                      "description": "`invoice`, `bill`, `credit-note`, `expense` or `journal`."
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Concurrency token for expenses (an expense has no version number)."
+                    },
+                    "version_number": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "format": "int32",
+                      "description": "Concurrency token for documents and journals, sent back as `expected_version`."
+                    }
+                  }
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/CursorPagination"
+              }
+            }
+          }
+        }
+      },
       "DetailedGeneralLedgerReportResponse": {
         "type": "object",
         "properties": {
@@ -6615,6 +9975,200 @@
           }
         }
       },
+      "DimensionAmounts": {
+        "type": "object",
+        "description": "Revenue is credit minus debit, expense is debit minus credit, both in company base currency.",
+        "required": [
+          "revenue",
+          "expense",
+          "net_income"
+        ],
+        "properties": {
+          "expense": {
+            "type": "string"
+          },
+          "net_income": {
+            "type": "string"
+          },
+          "revenue": {
+            "type": "string"
+          }
+        }
+      },
+      "DimensionCorrectionItem": {
+        "type": "object",
+        "required": [
+          "line_id",
+          "dimension_state"
+        ],
+        "properties": {
+          "dimension_state": {
+            "$ref": "#/components/schemas/DimensionState"
+          },
+          "line_id": {
+            "type": "string"
+          }
+        }
+      },
+      "DimensionCorrectionLine": {
+        "type": "object",
+        "description": "One line of a dimension-only correction: the line's complete set of values (`[]` clears it).",
+        "required": [
+          "id",
+          "dimension_values"
+        ],
+        "properties": {
+          "dimension_values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DimensionValueRef"
+            }
+          },
+          "id": {
+            "type": "string",
+            "description": "The line's current id (document item id, expense item id, journal line id)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "DimensionCorrectionRequest": {
+        "type": "object",
+        "description": "Changes line values and nothing else. Only the fields below are read; anything else in the body is\nignored, so amounts, accounts, taxes and dates cannot move through it.",
+        "required": [
+          "lines"
+        ],
+        "properties": {
+          "expected_updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Concurrency token for expenses: the expense's `updated_at` as listed (null when never updated)."
+          },
+          "expected_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Concurrency token for documents and journals: the record's current `version_number`."
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DimensionCorrectionLine"
+            },
+            "description": "At most 100 lines. A line not listed keeps its values."
+          }
+        }
+      },
+      "DimensionInclude": {
+        "type": "string",
+        "enum": [
+          "values"
+        ]
+      },
+      "DimensionIncomeAccount": {
+        "type": "object",
+        "required": [
+          "account_id",
+          "account_name",
+          "account_code",
+          "account_type",
+          "amount"
+        ],
+        "properties": {
+          "account_code": {
+            "type": "string",
+            "description": "Account code in the chart of accounts."
+          },
+          "account_id": {
+            "type": "string",
+            "description": "Account identifier (`id` from the chart of accounts)."
+          },
+          "account_name": {
+            "type": "string",
+            "description": "Account name in the chart of accounts."
+          },
+          "account_type": {
+            "type": "string",
+            "description": "`revenue` or `expense`."
+          },
+          "amount": {
+            "type": "string",
+            "description": "Decimal string in the record's currency."
+          }
+        }
+      },
+      "DimensionIncomeBucket": {
+        "type": "object",
+        "required": [
+          "value_id",
+          "code",
+          "name",
+          "is_archived",
+          "direct",
+          "inclusive"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "direct": {
+            "$ref": "#/components/schemas/DimensionAmounts",
+            "description": "Lines tagged with exactly this value."
+          },
+          "inclusive": {
+            "$ref": "#/components/schemas/DimensionAmounts",
+            "description": "This value plus every descendant. Never add inclusive amounts across buckets."
+          },
+          "is_archived": {
+            "type": "boolean",
+            "description": "Whether the record is archived."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "parent_value_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "value_id": {
+            "type": "string"
+          }
+        }
+      },
+      "DimensionLineValue": {
+        "type": "object",
+        "required": [
+          "value_id",
+          "code",
+          "name"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "value_id": {
+            "type": "string"
+          }
+        }
+      },
+      "DimensionScope": {
+        "type": "string",
+        "enum": [
+          "contacts",
+          "items",
+          "transactions"
+        ]
+      },
       "DimensionState": {
         "type": "object",
         "required": [
@@ -6627,6 +10181,93 @@
               "$ref": "#/components/schemas/ResolvedDimension"
             },
             "description": "One entry per dimension that has a value; dimensions without a value are absent."
+          }
+        }
+      },
+      "DimensionStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "archived",
+          "all"
+        ]
+      },
+      "DimensionValue": {
+        "type": "object",
+        "required": [
+          "id",
+          "dimension_id",
+          "code",
+          "name",
+          "path",
+          "is_group",
+          "is_archived",
+          "can_restore_default_label"
+        ],
+        "properties": {
+          "can_restore_default_label": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "default_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dimension_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "Identifier of the record."
+          },
+          "is_archived": {
+            "type": "boolean",
+            "description": "Whether the record is archived."
+          },
+          "is_group": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ValuePathEntry"
+              }
+            ]
+          },
+          "parent_value_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValuePathEntry"
+            }
+          },
+          "template_key": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -6648,6 +10289,33 @@
           }
         },
         "additionalProperties": false
+      },
+      "DimensionWorklistLock": {
+        "type": "object",
+        "description": "The Transaction Lock that covers a record's date, judged for the calling user by the same rule\nthe save uses. Absent when no lock covers it.",
+        "required": [
+          "level",
+          "label",
+          "from_date"
+        ],
+        "properties": {
+          "from_date": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string",
+            "description": "`hard` (nobody can save), `blocked` (a soft lock this user cannot bypass) or `soft` (the\nuser may bypass it: the save goes through and governance logs the bypass)."
+          },
+          "to_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
       },
       "GeneralLedgerEntry": {
         "type": "object",
@@ -8118,6 +11786,165 @@
           }
         }
       },
+      "SettlementPreviewForm": {
+        "type": "object",
+        "description": "Selects bank and document records for a settlement preview before reconciliation is confirmed.",
+        "required": [
+          "entity",
+          "entity_id",
+          "selections"
+        ],
+        "properties": {
+          "entity": {
+            "type": "string"
+          },
+          "entity_id": {
+            "type": "string"
+          },
+          "selections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettlementPreviewSelection"
+            },
+            "maxItems": 50,
+            "minItems": 1
+          }
+        }
+      },
+      "SettlementPreviewResponse": {
+        "type": "object",
+        "description": "Successful response envelope. Read the operation result from `data`; list metadata belongs inside that result.",
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "base_currency",
+              "entity_id",
+              "document_currency",
+              "document_outstanding",
+              "document_remaining",
+              "rows"
+            ],
+            "properties": {
+              "base_currency": {
+                "type": "string"
+              },
+              "document_currency": {
+                "type": "string"
+              },
+              "document_outstanding": {
+                "type": "string"
+              },
+              "document_remaining": {
+                "type": "string"
+              },
+              "entity_id": {
+                "type": "string"
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SettlementPreviewRow"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SettlementPreviewRow": {
+        "type": "object",
+        "required": [
+          "mapping",
+          "estimated",
+          "rate",
+          "settlement_rate",
+          "rate_base",
+          "rate_target",
+          "rate_source",
+          "as_of_date_matched",
+          "bank_remaining",
+          "realised_fx"
+        ],
+        "properties": {
+          "as_of_date_matched": {
+            "type": "boolean"
+          },
+          "bank_remaining": {
+            "type": "string"
+          },
+          "estimated": {
+            "type": "boolean",
+            "description": "FX estimate only; confirmation is established by the two explicit amounts."
+          },
+          "mapping": {
+            "$ref": "#/components/schemas/TransactionMappingModel"
+          },
+          "rate": {
+            "type": "string"
+          },
+          "rate_base": {
+            "type": "string"
+          },
+          "rate_source": {
+            "type": "string"
+          },
+          "rate_target": {
+            "type": "string"
+          },
+          "rate_time": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "realised_fx": {
+            "type": "string",
+            "description": "Positive is a gain, negative is a loss, in company base currency."
+          },
+          "settlement_rate": {
+            "type": "string",
+            "description": "Implied bank currency per document unit, including the confirmed fee.\nUnlike `rate` (the quote), this is derived from the explicit amounts."
+          }
+        }
+      },
+      "SettlementPreviewSelection": {
+        "type": "object",
+        "required": [
+          "transaction_id"
+        ],
+        "properties": {
+          "bank_amount": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bank_charge": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Bank fee withheld from the payment, as a decimal string. The payment amount plus this charge is applied to the document."
+          },
+          "document_amount": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "settlement_rate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional settlement rate: one document-currency unit in bank currency.\nPositive, with up to 12 whole digits and six decimal places."
+          },
+          "transaction_id": {
+            "type": "string"
+          }
+        }
+      },
       "TransactionConfirmFormModel": {
         "type": "object",
         "description": "Confirms selected bank transactions using the supplied accounting mappings.",
@@ -8577,6 +12404,55 @@
           }
         }
       },
+      "UpdateDimensionRequest": {
+        "type": "object",
+        "description": "Updates an accounting dimension's editable definition fields. Omitted fields retain their current values.",
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DimensionScope"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateDimensionValueRequest": {
+        "type": "object",
+        "description": "Updates a dimension value's editable fields, including its label and parent assignment.",
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_group": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "parent_value_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "UserError": {
         "type": "object",
         "description": "Structured details explaining why an API operation was rejected.",
@@ -8657,6 +12533,31 @@
         }
       },
       "Value": {},
+      "ValueCounts": {
+        "type": "object",
+        "required": [
+          "active",
+          "archived",
+          "all"
+        ],
+        "properties": {
+          "active": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "all": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "archived": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
       "ValuePathEntry": {
         "type": "object",
         "required": [

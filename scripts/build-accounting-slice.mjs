@@ -19,7 +19,14 @@ const SLICE_SPEC = new URL("../packages/accounting/openapi/openapi-embed-v1.json
 
 const METHODS = new Set(["get", "post", "put", "patch", "delete"]);
 
-/** Curated accounting surface, as METHOD + parameterless path. */
+/**
+ * Curated accounting surface, as METHOD + parameterless path.
+ *
+ * Deliberately excluded, so a refresh does not quietly pull them in:
+ *   GET /v1/accounting/expense-accounts      — expense module concern
+ *   GET /v1/accounting/match-policies        — company-wide reconciliation
+ *   PUT /v1/accounting/match-policies/default  configuration, not per-client
+ */
 const CURATED_OPERATIONS = [
   "POST /v1/app-connect/oauth/token",
   "POST /v1/app-connect/oauth/token/validate",
@@ -40,6 +47,29 @@ const CURATED_OPERATIONS = [
   "GET /v1/accounting/journals/{}",
   "PUT /v1/accounting/journals/{}",
   "DELETE /v1/accounting/journals/{}",
+  // Tagged under Journals upstream, but this is how a journal is tagged with
+  // dimension values: shipping the dimension catalog without it would let a client
+  // define dimensions and never apply one.
+  "PUT /v1/accounting/journals/{}/dimensions",
+  "GET /v1/accounting/dimensions",
+  "POST /v1/accounting/dimensions",
+  "POST /v1/accounting/dimensions/initialize",
+  "GET /v1/accounting/dimensions/worklist",
+  "GET /v1/accounting/dimensions/worklist/summary",
+  "GET /v1/accounting/dimensions/{}",
+  "PATCH /v1/accounting/dimensions/{}",
+  "GET /v1/accounting/dimensions/{}/account-lines",
+  "GET /v1/accounting/dimensions/{}/income-statement",
+  "POST /v1/accounting/dimensions/{}/archive",
+  "POST /v1/accounting/dimensions/{}/unarchive",
+  "POST /v1/accounting/dimensions/{}/restore-label",
+  "GET /v1/accounting/dimensions/{}/values",
+  "POST /v1/accounting/dimensions/{}/values",
+  "GET /v1/accounting/dimensions/{}/values/{}",
+  "PATCH /v1/accounting/dimensions/{}/values/{}",
+  "POST /v1/accounting/dimensions/{}/values/{}/archive",
+  "POST /v1/accounting/dimensions/{}/values/{}/unarchive",
+  "POST /v1/accounting/dimensions/{}/values/{}/restore-label",
   "GET /v1/accounting/reconciliations",
   "POST /v1/accounting/reconciliations",
   "GET /v1/accounting/reconciliations/{}",
@@ -49,6 +79,7 @@ const CURATED_OPERATIONS = [
   "PUT /v1/accounting/reconciliations/{}/void",
   "GET /v1/accounting/transactions",
   "GET /v1/accounting/transactions/{}",
+  "POST /v1/accounting/transactions/settlement-preview",
   "POST /v1/accounting/transactions/confirm-match",
   "POST /v1/accounting/transactions/exclude",
   "POST /v1/accounting/transactions/find-group-match",
