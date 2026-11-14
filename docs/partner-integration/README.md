@@ -38,7 +38,8 @@ npm install @paprel/embed-core @paprel/embed-accounting @paprel/embed-reports
 
 Embed v1 API slice (for codegen and AI context):
 
-- npm: `@paprel/embed-accounting/openapi/openapi-embed-v1.json` (after `npm install @paprel/embed-core`)
+- npm default: `@paprel/embed-core/openapi/openapi.json` (complete public API)
+- optional accounting-only slice: `@paprel/embed-accounting/openapi/openapi-embed-v1.json`
 - Full gateway spec: [paprel.com API documentation](https://paprel.com/api-documentation)
 
 The slice is versioned with the package so consumer tooling always matches the installed SDK release.
@@ -58,7 +59,7 @@ Production partners replace the Vite middleware with a real server route; the **
 When Paprel shares OpenAPI + embed docs, a partner engineer (or AI agent) should:
 
 1. Open [`../prompts/build-embed-bff.md`](../prompts/build-embed-bff.md)
-2. Attach `openapi-embed-v1.json`, [`bff-contract.md`](bff-contract.md), and this guide
+2. Attach the complete `openapi.json`, [`bff-contract.md`](bff-contract.md), and this guide; use `openapi-embed-v1.json` only when intentionally limiting the client to accounting
 3. Fill in **Partner stack** (framework, auth, widgets)
 4. Generate BFF route + `configureAccounting` page
 5. Verify against the [reference application](https://github.com/nexara-global/paprel-embed-ui-examples/tree/main/apps/real-estate-accounting) behavior (token 200, widgets load, Bearer on `/v1/...`)
