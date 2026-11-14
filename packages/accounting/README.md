@@ -72,7 +72,7 @@ See `@paprel/embed-ui` for the shared token contract. Importing `@paprel/embed-u
 
 ## OpenAPI
 
-The versioned accounting API slice ships at `@paprel/embed-accounting/openapi/openapi-embed-v1.json` for tooling and integration reference.
+The complete public API is the default contract and ships at `@paprel/embed-core/openapi/openapi.json`. This package also ships the optional accounting-only slice at `@paprel/embed-accounting/openapi/openapi-embed-v1.json` for clients that intentionally want a narrower contract.
 
 ## Documentation
 

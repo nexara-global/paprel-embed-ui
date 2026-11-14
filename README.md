@@ -33,7 +33,7 @@ Consumer examples now live in the dedicated [Paprel Embed examples repository](h
 |------|-----|
 | Why you need a BFF | [Build your BFF](https://paprel.com/documentation/embedded-ui/build-bff) |
 | Token route contract (for humans + AI) | [`docs/partner-integration/bff-contract.md`](docs/partner-integration/bff-contract.md) |
-| Cursor / Claude / Codex prompts | [`docs/prompts/README.md`](docs/prompts/README.md) — attach OpenAPI slice + `build-embed-bff.md` |
+| Cursor / Claude / Codex prompts | [`docs/prompts/README.md`](docs/prompts/README.md) — attach the complete OpenAPI contract + `build-embed-bff.md` |
 | Reference BFF (dev) | [Real-estate example BFF](https://github.com/nexara-global/paprel-embed-ui-examples/blob/main/apps/real-estate-accounting/server/embed-token-bff.ts) |
 
 Typical flow: App Connect client → partner `/api/embed-token` → `configureAccounting` → mount widgets.

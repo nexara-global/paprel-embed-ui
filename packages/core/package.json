@@ -9,9 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./openapi/openapi.json": "./openapi/openapi.json"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": ["dist", "openapi", "README.md", "LICENSE"],
   "scripts": {
     "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json",
     "test": "node --import tsx --test src/*.test.ts src/**/*.test.ts",

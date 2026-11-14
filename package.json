@@ -7,7 +7,9 @@
   ],
   "scripts": {
     "build": "npm run build -w @paprel/embed-core && npm run build -w @paprel/embed-ui && npm run build -w @paprel/embed-accounting && npm run build -w @paprel/embed-reports",
-    "test": "npm run test --workspaces --if-present && npm run build && node --import tsx --test scripts/*.test.ts",
+    "openapi:slice": "node scripts/build-accounting-slice.mjs",
+    "openapi:slice:check": "node scripts/build-accounting-slice.mjs --check",
+    "test": "npm run openapi:slice:check && npm run test --workspaces --if-present && npm run build && node --import tsx --test scripts/*.test.ts",
     "lint": "npm run build && npm run lint --workspaces --if-present",
     "pack:check": "node scripts/pack-check.mjs",
     "consumer:check": "node scripts/consumer-check.mjs",

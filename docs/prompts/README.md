@@ -15,7 +15,7 @@ Copy these into **Cursor**, **Claude**, or **Codex** when building a partner int
 
 When asking an agent to build integration from scratch, provide:
 
-1. **OpenAPI embed slice** — `@paprel/embed-accounting/openapi/openapi-embed-v1.json` (after `npm install @paprel/embed-core`), or [paprel.com API documentation](https://paprel.com/api-documentation)
+1. **Complete OpenAPI contract (default)** — `@paprel/embed-core/openapi/openapi.json`, or [paprel.com API documentation](https://paprel.com/api-documentation). The optional accounting-only slice is `@paprel/embed-accounting/openapi/openapi-embed-v1.json`.
 2. **BFF contract** — [`../partner-integration/bff-contract.md`](../partner-integration/bff-contract.md)
 3. **Partner BFF guide** — [Paprel: Build your BFF](https://paprel.com/documentation/embedded-ui/build-bff)
 4. **This prompt** — [`build-embed-bff.md`](build-embed-bff.md)
