@@ -140,6 +140,10 @@ export class PaprelJournalEditor extends LitElement {
         return i18n.t("validationDebitCreditMismatch");
       case "BOTH_DEBIT_CREDIT_SET":
         return i18n.t("validationBothDebitCredit");
+      case "VERSION_CONFLICT":
+        return i18n.t("versionConflict");
+      case "JOURNAL_LOCKED":
+        return i18n.t("journalLocked");
       default:
         return code.toLowerCase().replaceAll("_", " ").replace(/^./, (letter) => letter.toUpperCase()) + ".";
     }
@@ -244,10 +248,18 @@ export class PaprelJournalEditor extends LitElement {
       );
     } catch (err) {
       if (err instanceof PaprelApiError) {
-        this.fieldErrors = err.fieldErrors;
-        this.error = !Object.keys(err.fieldErrors).length || hasUnmappedValidation(err.fieldErrors, (field) => this.isInlineField(field))
-          ? err.message
-          : "";
+        if (err.message === "VERSION_CONFLICT" || err.code === "VERSION_CONFLICT") {
+          this.fieldErrors = {};
+          this.error = this.validationMessage("VERSION_CONFLICT");
+        } else if (err.message === "JOURNAL_LOCKED" || err.code === "JOURNAL_LOCKED") {
+          this.fieldErrors = {};
+          this.error = this.validationMessage("JOURNAL_LOCKED");
+        } else {
+          this.fieldErrors = err.fieldErrors;
+          this.error = !Object.keys(err.fieldErrors).length || hasUnmappedValidation(err.fieldErrors, (field) => this.isInlineField(field))
+            ? err.message
+            : "";
+        }
       } else {
         this.error = err instanceof Error ? err.message : "Save failed";
       }

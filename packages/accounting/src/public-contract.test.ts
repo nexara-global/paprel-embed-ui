@@ -71,6 +71,8 @@ describe("public accounting data contracts", () => {
       assert.equal(i18n.t("confirmMatchPrompt", { label: "INV-1", amount: "110.00 USD" }).includes("{amount}"), false);
       assert.ok(i18n.t("accountCreatedSuccess").length > 0);
       assert.ok(i18n.t("journalUpdatedSuccess").length > 0);
+      assert.ok(i18n.t("versionConflict").length > 0);
+      assert.ok(i18n.t("journalLocked").length > 0);
       assert.ok(i18n.t("reconciliationCreatedSuccess").length > 0);
       assert.ok(i18n.t("transactionLockCreatedSuccess").length > 0);
     }
