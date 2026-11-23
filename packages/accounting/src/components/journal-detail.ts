@@ -20,6 +20,61 @@ export class PaprelJournalDetail extends LitElement {
     css`
       .ledger-detail-top .ledger-meta-panel { margin-top: 0; }
       .ledger-detail-status { margin-top: 0.75rem; }
+      .journal-history-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .journal-history-bar label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 650;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--paprel-color-muted, #78786f);
+      }
+      .journal-compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .journal-compare-pane {
+        border: 1px solid var(--paprel-color-border, #e8e8e2);
+        border-radius: 0.75rem;
+        overflow: hidden;
+      }
+      .journal-compare-pane.is-current .journal-compare-banner {
+        background: #1f2933;
+        color: #fff;
+      }
+      .journal-compare-pane.is-snapshot .journal-compare-banner {
+        background: var(--paprel-color-surface-muted, #f7f7f4);
+      }
+      .journal-compare-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        min-height: 2.75rem;
+        padding: 0.5rem 0.875rem;
+        font-size: 0.6875rem;
+        font-weight: 750;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .journal-compare-pane.is-snapshot .ledger-detail {
+        opacity: 0.82;
+        filter: grayscale(0.35);
+      }
+      @media (max-width: 767px) {
+        .journal-compare-grid { display: block; }
+        .journal-compare-pane.is-snapshot { display: none; }
+        .journal-history-bar { display: none; }
+      }
     `,
   ];
 
@@ -31,18 +86,32 @@ export class PaprelJournalDetail extends LitElement {
   @state() private actionError = "";
   @state() private acting = false;
   @state() private journal: JournalDetail | null = null;
+  @state() private compareJournal: JournalDetail | null = null;
+  @state() private compareVersionId = "";
+  @state() private compareLoading = false;
   @state() private accountLabels = new Map<string, string>();
+  @state() private wideEnough = true;
 
   private offLocaleChange?: () => void;
+  private onResize = (): void => {
+    const next = typeof window === "undefined" || window.matchMedia("(min-width: 768px)").matches;
+    if (next !== this.wideEnough) {
+      this.wideEnough = next;
+      if (!next) this.clearCompare();
+    }
+  };
 
   async connectedCallback(): Promise<void> {
     super.connectedCallback();
     this.offLocaleChange = onEmbedLocaleChange(() => this.requestUpdate());
+    this.onResize();
+    window.addEventListener("resize", this.onResize);
     if (this.journalId) await this.load();
   }
 
   disconnectedCallback(): void {
     this.offLocaleChange?.();
+    window.removeEventListener("resize", this.onResize);
     super.disconnectedCallback();
   }
 
@@ -80,6 +149,7 @@ export class PaprelJournalDetail extends LitElement {
   private async load(): Promise<void> {
     this.loading = true;
     this.error = "";
+    this.clearCompare();
     try {
       const [journal] = await Promise.all([
         getEmbedClient().journals.getById(this.journalId),
@@ -91,6 +161,36 @@ export class PaprelJournalDetail extends LitElement {
       this.journal = null;
     } finally {
       this.loading = false;
+    }
+  }
+
+  private clearCompare(): void {
+    this.compareVersionId = "";
+    this.compareJournal = null;
+    this.compareLoading = false;
+  }
+
+  private versionHistory() {
+    return this.journal?.version_history ?? [];
+  }
+
+  private async onHistoryChange(event: Event): Promise<void> {
+    if (!this.wideEnough) return;
+    const versionId = (event.target as HTMLSelectElement).value;
+    if (!versionId || versionId === this.journal?.id) {
+      this.clearCompare();
+      return;
+    }
+    this.compareVersionId = versionId;
+    this.compareLoading = true;
+    this.compareJournal = null;
+    try {
+      const anchor = this.journal?.anchor_id || this.journalId;
+      this.compareJournal = await getEmbedClient().journals.getById(anchor, versionId);
+    } catch {
+      this.compareJournal = null;
+    } finally {
+      this.compareLoading = false;
     }
   }
 
@@ -220,43 +320,28 @@ export class PaprelJournalDetail extends LitElement {
     `;
   }
 
-  render() {
+  private journalPane(journal: JournalDetail) {
     const i18n = getEmbedI18n();
-    if (!this.journalId) {
-      return html`<div class="ledger-empty">${i18n.t("selectJournal")}</div>`;
-    }
-    if (this.loading) {
-      return html`<div class="state-loading">${i18n.t("loadingJournal")}</div>`;
-    }
-    if (this.error) {
-      return html`<div class="ledger-error">${this.error}</div>`;
-    }
-    if (!this.journal) {
-      return html`<div class="ledger-empty">${i18n.t("journalNotFound")}</div>`;
-    }
-
-    const lines = this.journal.lines ?? [];
+    const lines = journal.lines ?? [];
     const { debit, credit } = computeJournalTotals(lines);
-    const identifier = this.journal.identifier ?? this.journal.reference ?? this.journal.id;
-    const showFx =
-      this.journal.exchange_rate != null && String(this.journal.exchange_rate) !== "1";
+    const identifier = journal.identifier ?? journal.reference ?? journal.id;
+    const showFx = journal.exchange_rate != null && String(journal.exchange_rate) !== "1";
 
     const metaRows: { label: string; value: string }[] = [
       { label: "Journal", value: `#${identifier}` },
     ];
-    if (this.journal.description) {
-      metaRows.push({ label: i18n.t("description"), value: this.journal.description });
+    if (journal.description) {
+      metaRows.push({ label: i18n.t("description"), value: journal.description });
     }
-    if (this.journal.date) metaRows.push({ label: i18n.t("date"), value: this.journal.date });
-    if (this.journal.reference) metaRows.push({ label: i18n.t("reference"), value: this.journal.reference });
-    if (this.journal.currency) metaRows.push({ label: i18n.t("currency"), value: this.journal.currency });
+    if (journal.date) metaRows.push({ label: i18n.t("date"), value: journal.date });
+    if (journal.reference) metaRows.push({ label: i18n.t("reference"), value: journal.reference });
+    if (journal.currency) metaRows.push({ label: i18n.t("currency"), value: journal.currency });
     if (showFx) {
-      metaRows.push({ label: i18n.t("exchangeRate"), value: String(this.journal.exchange_rate) });
+      metaRows.push({ label: i18n.t("exchangeRate"), value: String(journal.exchange_rate) });
     }
 
     return html`
       <div class="ledger-detail">
-        ${this.actionBar(this.journal)}
         <div class="ledger-detail-top">
           <div>
             ${metaRows.length
@@ -273,13 +358,13 @@ export class PaprelJournalDetail extends LitElement {
                   </div>
                 `
               : null}
-            <div class="ledger-detail-status">${this.statusPills(this.journal)}</div>
+            <div class="ledger-detail-status">${this.statusPills(journal)}</div>
 
-            ${this.journal.is_manual_override && this.journal.is_manual
+            ${journal.is_manual_override && journal.is_manual
               ? html`<div class="override-banner">
                   <strong>${i18n.t("manualOverride")}</strong>
-                  ${this.journal.override_reason
-                    ? html`<div style="margin-top:0.25rem;font-style:italic">${this.journal.override_reason}</div>`
+                  ${journal.override_reason
+                    ? html`<div style="margin-top:0.25rem;font-style:italic">${journal.override_reason}</div>`
                     : null}
                 </div>`
               : null}
@@ -287,7 +372,7 @@ export class PaprelJournalDetail extends LitElement {
 
           <div class="ledger-amount-panel">
             <span class="meta-label">${i18n.t("amount")}</span>
-            <div class="ledger-amount-value">${formatJournalAmount(debit, this.journal.currency)}</div>
+            <div class="ledger-amount-value">${formatJournalAmount(debit, journal.currency)}</div>
           </div>
         </div>
 
@@ -308,8 +393,8 @@ export class PaprelJournalDetail extends LitElement {
                 return html`<tr>
                   <td>${this.accountName(line.account_id)}</td>
                   <td>${line.description || "—"}</td>
-                  <td class="numeric">${debitAmt ? formatJournalAmount(debitAmt, this.journal?.currency) : ""}</td>
-                  <td class="numeric">${creditAmt ? formatJournalAmount(creditAmt, this.journal?.currency) : ""}</td>
+                  <td class="numeric">${debitAmt ? formatJournalAmount(debitAmt, journal.currency) : ""}</td>
+                  <td class="numeric">${creditAmt ? formatJournalAmount(creditAmt, journal.currency) : ""}</td>
                 </tr>`;
               })}
             </tbody>
@@ -317,12 +402,84 @@ export class PaprelJournalDetail extends LitElement {
               <tr>
                 <td></td>
                 <td>${i18n.t("total")}</td>
-                <td class="numeric">${formatJournalAmount(debit, this.journal.currency)}</td>
-                <td class="numeric">${formatJournalAmount(credit, this.journal.currency)}</td>
+                <td class="numeric">${formatJournalAmount(debit, journal.currency)}</td>
+                <td class="numeric">${formatJournalAmount(credit, journal.currency)}</td>
               </tr>
             </tfoot>
           </table>
         </div>
+      </div>
+    `;
+  }
+
+  render() {
+    const i18n = getEmbedI18n();
+    if (!this.journalId) {
+      return html`<div class="ledger-empty">${i18n.t("selectJournal")}</div>`;
+    }
+    if (this.loading) {
+      return html`<div class="state-loading">${i18n.t("loadingJournal")}</div>`;
+    }
+    if (this.error) {
+      return html`<div class="ledger-error">${this.error}</div>`;
+    }
+    if (!this.journal) {
+      return html`<div class="ledger-empty">${i18n.t("journalNotFound")}</div>`;
+    }
+
+    const history = this.versionHistory();
+    const comparing = Boolean(this.compareVersionId) && this.wideEnough;
+
+    return html`
+      <div>
+        ${this.actionBar(this.journal)}
+        ${history.length > 1 && this.wideEnough
+          ? html`
+              <div class="journal-history-bar">
+                <label>
+                  ${i18n.t("versionHistory")}
+                  <select .value=${this.compareVersionId || this.journal.id} @change=${this.onHistoryChange}>
+                    ${history.map(
+                      (version) => html`
+                        <option value=${version.id} ?disabled=${version.is_current}>
+                          v${version.version_number}
+                          ${version.is_current ? i18n.t("currentVersion") : i18n.t("archivedVersion")}
+                        </option>
+                      `,
+                    )}
+                  </select>
+                </label>
+                ${comparing
+                  ? html`<button type="button" class="secondary" @click=${this.clearCompare}>
+                      ${i18n.t("closeComparison")}
+                    </button>`
+                  : null}
+              </div>
+            `
+          : null}
+        ${comparing
+          ? html`
+              <div class="journal-compare-grid">
+                <div class="journal-compare-pane is-current">
+                  <div class="journal-compare-banner">
+                    ${i18n.t("currentVersion")} v${this.journal.version_number ?? ""}
+                  </div>
+                  ${this.journalPane(this.journal)}
+                </div>
+                <div class="journal-compare-pane is-snapshot">
+                  <div class="journal-compare-banner">
+                    ${i18n.t("snapshotVersion")}
+                    ${this.compareJournal ? html`v${this.compareJournal.version_number ?? ""}` : null}
+                  </div>
+                  ${this.compareLoading
+                    ? html`<div class="state-loading">${i18n.t("loadingJournal")}</div>`
+                    : this.compareJournal
+                      ? this.journalPane(this.compareJournal)
+                      : html`<div class="ledger-empty">${i18n.t("journalNotFound")}</div>`}
+                </div>
+              </div>
+            `
+          : this.journalPane(this.journal)}
       </div>
     `;
   }

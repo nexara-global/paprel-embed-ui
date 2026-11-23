@@ -1,11 +1,17 @@
 import type { HttpClient } from "@paprel/embed-core";
 import type { JournalDetail, JournalForm, JournalListResult, JournalSummary, ListJournalsParams } from "../types.js";
 
+export function journalAnchorId(row: { anchor_id?: string | null; id?: string | null } | null | undefined): string {
+  return String(row?.anchor_id || row?.id || "");
+}
+
 function mapJournalSummary(raw: unknown): JournalSummary {
   const row = raw as Record<string, unknown>;
+  const id = String(row.id ?? "");
   return {
     ...(row as JournalSummary),
-    id: String(row.id ?? ""),
+    id,
+    anchor_id: String(row.anchor_id ?? id),
     posted: Boolean(row.posted ?? row.is_posted),
   };
 }
@@ -68,8 +74,10 @@ export function createJournalsResource(http: HttpClient) {
       return normalizeJournalListResponse(data);
     },
 
-    async getById(journalId: string): Promise<JournalDetail> {
-      return http.request<JournalDetail>("GET", `/v1/accounting/journals/${journalId}`);
+    async getById(journalId: string, version?: string | number): Promise<JournalDetail> {
+      return http.request<JournalDetail>("GET", `/v1/accounting/journals/${journalId}`, {
+        query: { version },
+      });
     },
 
     async create(form: JournalForm): Promise<JournalDetail> {
