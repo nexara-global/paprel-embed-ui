@@ -43,6 +43,8 @@ Use with complete domain packages such as `@paprel/embed-accounting`. Business r
 
 ## Documentation
 
+The complete Paprel public API contract ships at `@paprel/embed-core/openapi/openapi.json`. It is the default specification for client generation and includes every public module, including accounting reports.
+
 - [Embedded UI overview](https://paprel.com/documentation/embedded-ui/overview)
 - [Build your BFF](https://paprel.com/documentation/embedded-ui/build-bff)
 - [20-minute integration guide](https://paprel.com/documentation/guides/build-embedded-accounting-20-minutes)

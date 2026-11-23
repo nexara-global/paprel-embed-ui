@@ -1,6 +1,6 @@
 # Prompt: Build Paprel embed BFF + wire UI
 
-Use this when a developer provides Paprel OpenAPI (embed slice), embedded UI documentation, and asks you to implement the partner integration.
+Use this when a developer provides the complete Paprel OpenAPI contract, embedded UI documentation, and asks you to implement the partner integration.
 
 ---
 
@@ -20,7 +20,7 @@ Do not implement accounting business logic in the BFF. The BFF only exchanges `c
 
 - **BFF contract:** `paprel-embed/docs/partner-integration/bff-contract.md`
 - **Integration hub:** `docs/partner-integration/README.md`
-- **OpenAPI embed v1:** `@paprel/embed-accounting/openapi/openapi-embed-v1.json` (App Connect + `/v1/accounting/*`, `/v1/reports/*`) — or [paprel.com API documentation](https://paprel.com/api-documentation)
+- **OpenAPI (default):** `@paprel/embed-core/openapi/openapi.json` (all public APIs) — or [paprel.com API documentation](https://paprel.com/api-documentation). Use `@paprel/embed-accounting/openapi/openapi-embed-v1.json` only for an intentionally accounting-only client.
 - **Reference BFF:** `paprel-embed-ui-examples/apps/real-estate-accounting/server/embed-token-bff.ts`
 - **Reference frontend:** `paprel-embed-ui-examples/apps/real-estate-accounting/src/session/session-manager.ts` (`configureAccounting` block)
 
