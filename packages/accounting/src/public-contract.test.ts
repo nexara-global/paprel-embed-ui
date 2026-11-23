@@ -73,6 +73,7 @@ describe("public accounting data contracts", () => {
       assert.ok(i18n.t("journalUpdatedSuccess").length > 0);
       assert.ok(i18n.t("versionConflict").length > 0);
       assert.ok(i18n.t("journalLocked").length > 0);
+      assert.ok(i18n.t("journalVoided").length > 0);
       assert.ok(i18n.t("reconciliationCreatedSuccess").length > 0);
       assert.ok(i18n.t("transactionLockCreatedSuccess").length > 0);
     }

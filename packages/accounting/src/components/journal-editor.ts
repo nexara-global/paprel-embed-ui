@@ -144,6 +144,8 @@ export class PaprelJournalEditor extends LitElement {
         return i18n.t("versionConflict");
       case "JOURNAL_LOCKED":
         return i18n.t("journalLocked");
+      case "JOURNAL_VOIDED":
+        return i18n.t("journalVoided");
       default:
         return code.toLowerCase().replaceAll("_", " ").replace(/^./, (letter) => letter.toUpperCase()) + ".";
     }
@@ -254,6 +256,9 @@ export class PaprelJournalEditor extends LitElement {
         } else if (err.message === "JOURNAL_LOCKED" || err.code === "JOURNAL_LOCKED") {
           this.fieldErrors = {};
           this.error = this.validationMessage("JOURNAL_LOCKED");
+        } else if (err.message === "JOURNAL_VOIDED" || err.code === "JOURNAL_VOIDED") {
+          this.fieldErrors = {};
+          this.error = this.validationMessage("JOURNAL_VOIDED");
         } else {
           this.fieldErrors = err.fieldErrors;
           this.error = !Object.keys(err.fieldErrors).length || hasUnmappedValidation(err.fieldErrors, (field) => this.isInlineField(field))
